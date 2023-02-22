@@ -121,6 +121,126 @@ ukScript: http://www.google.com.index.html
 
 对于第 10 行代码，加`{ }`是为了帮助解释器识别变量的边界。
 
+# 字符串替换
+
+有时候，我们给脚本参数一个默认值，当我们不传入参数的时候，将使用默认值，传入参数的时候替换默认值作为当前值使用。
+
+#缺省值的替换
+```shell
+${parameter:-word} # 为空替换
+${parameter:=word} # 为空替换，并将值赋给$parameter变量
+${parameter:?word} # 为空报错
+${parameter:+word} # 不为空替换
+```
+
+**${parameter}**：和$parameter是相同的，都是表示变量parameter的值，可以把变量和字符串连接。
+
+示例：
+
+```sh
+# 变量和字符串拼接
+machine_id=${USER}@${HOSTNAME} 
+echo "$machine_id"   #root@ubuntu
+
+# get system $PATH
+echo "Original \$PATH = $PATH" # Original $PATH = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+
+PATH=${PATH}:/opt/bin  
+#在脚本的生存期内，能额外增加路径/opt/bin到环境变量$PATH中去. 
+echo "Current\$PATH = $PATH" # Original $PATH = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin:/opt/bin  
+```
+
+**${parameter-default}, ${parameter:-default}**：如果变量没有被设置，使用默认值。`${parameter-default}`和`${parameter:-default}`几乎是相等的。它们之间的差别是：当一个参数已被声明，但是值是NULL的时候两者不同。
+
+示例：
+```shell
+echo "====== \${parameter-alt_value} ======"
+
+# 不定义username变量时,获取到的name为-后的值, 即使用默认值
+name=${username-tom}
+echo "name=$name"  # name=tom
+
+# 定义username变量时,获取到的name为定义username的值,即为空
+username=""
+name=${username-tom}
+echo "name=$name"  # name=
+
+
+echo "====== \${parameter:-alt_value} ======"
+
+# 不定义username变量时,获取到的name为-后的值
+name=${username:-tom}
+echo "name=$name"  # name=tom
+
+# 定义了username变量,但是为空时,获取到的name为:-后的值,,即使用默认值
+username=""
+name=${username:-tom}
+echo "name=$name"   # name=tom
+
+# 定义了username变量,但是不为空时,获取到的name为定义username的值
+username="jack"
+name=${username:-tom}
+echo "name=$name"   # name=jack
+```
+
+**${parameter=default}, ${parameter:=default}**：如果变量parameter没有设置，把它设置成默认值。除了引起的当变量被声明且值是空值时有些不同外，两种形式几乎相等。
+
+示例：
+```shell
+echo "===== \${parameter+alt_value} ====="
+
+sub=${subject+math}
+echo "sub = $sub"      # sub =
+
+subject2=
+sub=${subject2+english}
+echo "sub = $sub"      # sub = english
+
+subject3=computer
+sub=${subject3+english}
+echo "sub = $sub"      # sub = english
+
+
+echo "====== \${parameter:+alt_value} ======"
+
+
+sub=${subject4:+english}
+echo "sub = $sub"      # sub = 
+
+subject5=
+sub=${subject5:+english} 
+echo "sub = $sub"     # sub = 
+# 产生与a=${subject5+english}不同。
+
+
+subject6=computer
+sub=${subject6:+english} 
+echo "sub = $sub"     # sub = english
+```
+
+
+
+**${parameter?err_msg}, ${parameter:?err_msg}**：如果变量parameter已经设置，则使用该值，否则打印err_msg错误信息。[demo20](https://wangchujiang.com/shell-tutorial/example/demo20)
+
+示例：
+```shell
+#!/bin/bash
+# 变量替换和"usage"信息
+
+: ${1?"Usage: $0 ARGUMENT"}
+#  如果没有提供命令行参数则脚本在这儿就退出了,
+#+ 并打印了错误信息.
+#    usage-message.sh: 1: Usage: usage-message.sh ARGUMENT
+
+echo "These two lines echo only if command-line parameter given."
+echo "command line parameter = \"$1\""
+
+exit 0  # 仅在命令行参数提供时，才会在这儿退出.
+
+# 分别检查有命令行参数和没有命令行参数时的退出状态。
+# 如果有命令行参数,则"$?"为0.
+# 否则, "$?"为1.
+```
 
 # 字符串截取
 

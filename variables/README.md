@@ -1,4 +1,5 @@
 # 变量的定义
+
 定义变量的格式：
 ```shell
 KEY="VALUE"
@@ -137,6 +138,51 @@ $HOME/.bashrc
 /etc/bashrc
 $HOME/.bash_logout
 ```
+
+### 内部变量
+
+| 内部变量          | 说明                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| $BASH             | Bash二进制程序文件的路径                                     |
+| $BASH_ENV         | 该环境变量保存一个Bash启动文件路径，当启动一个脚本程序时会去读该环境变量指定的文件。 |
+| $BASH_SUBSHELL    | 一个指示子shell(subshell)等级的变量。它是Bash版本3新加入的。 |
+| $BASH_VERSINFO[n] | 这个数组含有6个元素，指示了安装的Bash版本的信息。它和$BASH_VERSION相似，但它们还是有一些小小的不同。 |
+| $BASH_VERSION     | 安装在系统里的Bash版本。                                     |
+| $DIRSTACK         | 在目录堆栈里面最顶端的值(它受pushd和popd的控制)              |
+| $EDITOR           | 由脚本调用的默认的编辑器，一般是vi或是emacs。                |
+| $EUID             | 有效用户ID                                                   |
+| $FUNCNAME         | 当前函数的名字                                               |
+| $GLOBIGNORE       | 由通配符(globbing)扩展的一列文件名模式。                     |
+| $GROUPS           | 目前用户所属的组                                             |
+| $HOME             | 用户的家目录，通常是/home/username                           |
+| $HOSTNAME         | 在系统启动时由一个初始化脚本中用hostname命令给系统指派一个名字。然而，gethostname()函数能设置Bash内部变量E$HOSTNAME。 |
+| $HOSTTYPE         | 机器类型，像$MACHTYPE一样标识系统硬件。                      |
+| $IFS              | 内部字段分隔符                                               |
+| $IGNOREEOF        | 忽略EOF：在退出控制台前有多少文件结尾标识（end-of-files,control-D）会被shell忽略。 |
+| $LC_COLLATE       | 它常常在.bashrc或/etc/profile文件里被设置，它控制文件名扩展和模式匹配的展开顺序。 |
+| $LINENO           | 这个变量表示在本shell脚本中该变量出现时所在的行数。它只在脚本中它出现时有意义，它一般可用于调试。 |
+| $MACHTYPE         | 机器类型，识别系统的硬件类型。                               |
+| $OLDPWD           | 上一次工作的目录("OLD-print-working-directory",你上一次进入工作的目录) |
+| $TZ               | 时区                                                         |
+| $MAILCHECK        | 每隔多少秒检查是否有新的信件                                 |
+| $OSTYPE           | 操作系统类型                                                 |
+| $MANPATH man      | 指令的搜寻路径                                               |
+| $PATH             | 可执行程序文件的搜索路径。一般有/usr/bin/, /usr/X11R6/bin/, /usr/local/bin,等等。 |
+| $PIPESTATUS       | 此数组变量保存了最后执行的前台管道的退出状态。相当有趣的是，它不一定和最后执行的命令的退出状态一样。 |
+| $PPID             | 一个进程的$PPID变量保存它的父进程的进程ID(pid)。用这个变量和pidof命令比较。 |
+| $PROMPT_COMMAND   | 这个变量在主提示符前($PS1显示之前)执行它的值里保存的命令。   |
+| $PS1              | 这是主提示符（第一提示符），它能在命令行上看见。             |
+| $PS2              | 副提示符（第二提示符），它在期望有附加的输入时能看见。它显示像">"的提示。 |
+| $PS3              | 第三提示符。它在一个select循环里显示 (参考例子 10-29)。      |
+| $PS4              | 第四提示符，它在用-x选项调用一个脚本时的输出的每一行开头显示。它通常显示像"+"的提示。 |
+| $PWD              | 工作目录(即你现在所处的目录) ，它类似于内建命令pwd。         |
+| $REPLY            | 没有变量提供给read命令时的默认变量．这也适用于select命令的目录，但只是提供被选择的变量项目编号而不是变量本身的值。 |
+| $SECONDS          | 脚本已运行的秒数。                                           |
+| $SHELLOPTS        | 已经激活的shell选项列表，它是一个只读变量。                  |
+| $SHLVL            | SHELL的嵌套级别．指示了Bash被嵌套了多深．在命令行里，$SHLVL是1，因此在一个脚本里，它是2 |
+| $TMOUT            | 如果$TMOUT环境变量被设为非零值时间值time，那么经过time这么长的时间后，shell提示符会超时．这将使此shell退出登录 |
+| $UID              | 用户ID号，这是当前用户的用户标识号，它在/etc/passwd文件中记录。 |
+
 
 ## 系统变量
 
