@@ -145,7 +145,7 @@ done
 
 array1=(23 56)
 array2=(99 "name")
-array_new=(${array1[@]} ${array2[*]})
+array_new=(${array1[@]} ${array2[@]})
 echo ${array_new[@]}  #也可以写作 ${array_new[*]}
 ```
 
@@ -200,3 +200,38 @@ echo $new       # 结果：1 4 7 101
 ```
 备注: 数组中分隔符是空格，借助于tr将空格替换成换行符，再用sort命令的-n可以按自然数排序，便可达到目的。
 
+
+# 数组转字符串
+
+有时候，我们需要将数组转字符串做处理， 因此， 学习数组和字符串之间互相转换是必不可少的。
+
+将数组转换成字符串，原格式输出
+
+示例：
+```shell
+names=(jack tom luce)
+
+# 这种方式就是将数组转换成字符串的过程
+echo "${names[*]}" # 结果：jack tom luce
+```
+指定分隔符`,`，将数组转换成字符串
+
+示例：
+```shell
+names=(jack tom luce)
+string_name=$(IFS=,; echo "${names[*]}")
+echo ${string_name} # 结果：jack,tom,luce
+```
+注意： 要用${names[*]}，而不能是${names[@]}
+
+指定分隔符`|`，将数组转换成字符串，自己写代码拼接实现
+
+示例：
+```shell
+names=(jack tom luce)
+
+for name in "${names[@]}"; do
+   string_name="${string_name:+${string_name}|}${name}"
+done
+echo ${string_name} #结果： jack|tom|luce
+```

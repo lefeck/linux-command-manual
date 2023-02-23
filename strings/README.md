@@ -399,6 +399,102 @@ echo ${var%%/*}
 http:
 ```
 
+## 字符串转为数组
+
+要将字符串列表转变为数组，只需要在前面加()，所以关键是将分隔符转变为空格分隔，常用有下面几种方法
+
+方法一: 借助于{str//,/}来处理
+```shell
+str="ONE,TWO,THREE,FOUR"
+arr=(${str//,/})
+echo "Iterate through the values in the array: "${arr[@]}
+echo "print the value with index 1 : "${arr[1]}
+```
+输出结果：
+```text
+Iterate through the values in the array: ONE TWO THREE FOUR
+print the value with index 1 : TWO
+```
+如果中间是空格,
+示例：
+```shell
+str="ONE TWO THREE FOUR"
+arr=(${str})
+# 等同上 arr=(${str///})
+echo "Iterate through the values in the array: "${arr[@]}
+echo "print the value with index 1 : "${arr[1]}
+```
+输出结果：
+```text
+Iterate through the values in the array: ONE TWO THREE FOUR
+print the value with index 1 : TWO
+```
+
+
+方法二: 借助于tr命令来处理
+```shell
+str="ONE,TWO,THREE,FOUR"
+arr=(`echo $str | tr ',' ' '`)
+echo "Iterate through the values in the array: " ${arr[@]}
+echo "print the value with index 1 : "${arr[1]}
+```
+
+输出结果：
+```text
+Iterate through the values in the array: ONE,TWO,THREE,FOUR
+print the value with index 1 : TWO
+```
+
+方法三: 借助于awk命令来处理
+```shell
+str="ONE,TWO,THREE,FOUR"
+arr=($(echo $str | awk 'BEGIN{FS=",";OFS=" "} {print $1,$2,$3,$4}'))
+echo "Iterate through the values in the array: " ${arr[@]}
+echo "print the value with index 1 : "${arr[1]}
+```
+
+输出结果：
+```text
+Iterate through the values in the array: ONE,TWO,THREE,FOUR
+print the value with index 1 : TWO
+```
+
+方法四: 借助于IFS来处理分隔符
+
+```shell
+str="ONE,TWO,THREE,FOUR"
+IFS=","
+arr=($str)
+echo "Iterate through the values in the array: " ${arr[@]}
+echo "print the value with index 1 : "${arr[1]}
+```
+
+输出结果：
+```text
+Iterate through the values in the array: ONE,TWO,THREE,FOUR
+print the value with index 1 : TWO
+```
+
+```text
+myvar="string1 string2 string3"
+read -a myarray <<< $myvar
+echo "My array: ${myarray[@]}"
+echo "My array: ${myarray[0]}"
+echo "My array: ${myarray[1]}"
+echo "My array: ${myarray[2]}"
+echo "Number of elements in the array: ${#myarray[@]}"
+```
+
+```shell
+myvar="string1 string2 string3"
+myarray=($myvar)
+echo "My array: ${myarray[@]}"
+echo "My array: ${myarray[0]}"
+echo "My array: ${myarray[1]}"
+echo "My array: ${myarray[2]}"
+echo "Number of elements in the array: ${#myarray[@]}"
+```
+
 ## 总结
 
 最后，对以上 8 种格式做一个总结，如下表：
