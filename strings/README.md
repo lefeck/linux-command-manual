@@ -492,7 +492,7 @@ Iterate through the values in the array: ONE,TWO,THREE,FOUR
 print the value with index 1 : TWO
 ```
 
-方法四: 借助于read来处理
+方法五: 借助于read来处理
 
 ```text
 str="ONE TWO THREE FOUR"

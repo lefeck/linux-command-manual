@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="23be86c3-252d-491f-8a8f-dbc34f141280" name="变更" comment="simple command">
+    <list default="true" id="23be86c3-252d-491f-8a8f-dbc34f141280" name="变更" comment="">
+      <change afterPath="$PROJECT_DIR$/for/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strings/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/strings/README.md" afterDir="false" />
     </list>
