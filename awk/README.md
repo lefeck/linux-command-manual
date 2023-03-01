@@ -10,16 +10,27 @@ awk 分别代表其作者是三个人，分别是Alfred Aho、Brian Kernighan、
 
 ## awk语法格式
 ```shell
-awk [options] 'commands' filenames
-awk [options] -f awk-script-file filenames
+awk命令形式:
+
+awk [-F|-f|-v] 'BEGIN{} //{command1; command2} END{}' file
 
 说明：
 
-options： -F　　定义输入字段分隔符，默认的分隔符是空格或制表符(tab)
-command： 
-    BEGIN{}       {}            END{}
-    行处理前      行处理         行处理后
-
+options： 
+    [-F|-f|-v]   
+        -F　　 定义输入字段分隔符，默认的分隔符是空格或制表符(tab)
+        -f    调用脚本
+        -v    定义变量 var=value
+command：
+大体分3个模块组成，分别是：
+     BEGIN{}            {}               END{}
+    命令行处理前      命令行处理中         命令行处理后
+' '          引用代码块
+BEGIN{}        初始化代码块，在对每一行进行处理之前，初始化代码，主要是引用全局变量，设置FS分隔符
+//           用来定义需要匹配的模式（字符串或者正则表达式），对满足匹配模式的行进行上条代码块的操作
+{}           命令代码块，包含一条或多条命令
+;            多条命令使用分号分隔
+END{}          结尾代码块，在对每一行进行处理之后再执行的代码块，主要是进行最终计算或输出结尾摘要信息
 ```
 示例：
 ```shell
@@ -33,12 +44,16 @@ ok
 BEGIN{}　通常用于定义一些变量，例如BEGIN{FS=":";OFS="---"}
 
 ### awk命令格式
-
+```shell
 awk 'pattern' filename                //示例：awk -F: '/root/' /etc/passwd        
 awk '{action}' filename               //示例：awk -F: '{print $1}' /etc/passwd            
 awk 'pattern {action}' filename       //示例：awk -F: '/root/{print $1,$3}' /etc/passwd        
 //示例：awk 'BEGIN{FS=":"} /root/{print $1,$3}' /etc/passwd
-command |awk 'pattern {action}'       //示例：df -P| grep  '/' |awk '$4 > 25000 {print $4}'
+command | awk 'pattern {action}'       //示例：df -P| grep  '/' |awk '$4 > 25000 {print $4}'
+```
+
+
+
 
 ## 工作原理
 ```shell
@@ -52,18 +67,79 @@ $1 $2 $3 $4 $5   $6    $7
 ⑤、awk 输出之后，将从文件中获取另一行，并将其存储在$0中，覆盖原来的内容，然后将新的字符将新的字符串分隔成字段并进行处理，该过程将持续到所有行处理完毕；
 ```
 
-(四)、记录与字段相关内部变量：man awk
+#### -F指定分隔符
 
-$0：  //awk变量$0保存当前记录的内容              # awk -F: '{print $0}' /etc/passwd
-NR：  //在每行行首添加输入记录的总数              # awk -F: '{print NR, $0}' /etc/passwd
-FNR： //当前输入文件中的输入记录号	  			# awk -F: '{print FNR, $0}' /etc/passwd /etc/hosts
-NF：  //保存记录的字段数，$1,$2...$100           # awk -F: '{print $0,NF}' /etc/passwd
-FS：  //输入字段分隔符，默认空格                  # awk -F: '/root/{print $1, $3}' /etc/passwd
+内部变量
+
+| 变量名 | 注释                       |
+| ------ |--------------------------|
+| $0     | 当前记录的内容                  |
+| NR     | 在每行行首添加输入记录的行号           |
+| FNR    | 当前输入文件中的输入记录号            |
+| NF     | 保存记录每行的列数，$1,$2...$100 |
+| FS     | 输入字段分隔符，默认空格             |
+| OFS    | 输出字段分隔符                  |
+| RS     | 输入记录分隔符，默认情况下为换行         |
+| ORS    | 输出记录分隔符，默认情况下为换行         |
+| $1     | 每行第一个字段                  |
+| FILENAME      | awk读取的文件名                |
+| $1     | 每行第一个字段                  |
+| $1     | 每行第一个字段                  |
+          
+
+示例：
+```shell
+
+# awk -F: '{print $0}' /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+
+# awk -F: '{print NR, $0}' /etc/passwd
+1 root:x:0:0:root:/root:/bin/bash
+2 bin:x:1:1:bin:/bin:/sbin/nologin
+3 daemon:x:2:2:daemon:/sbin:/sbin/nologin
+4 adm:x:3:4:adm:/var/adm:/sbin/nologin
+5 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+6 sync:x:5:0:sync:/sbin:/bin/sync
+
+# awk -F: '{print FNR}' /etc/passwd /etc/hosts
+
+# awk -F: '{print $0,NF}' /etc/passwd
+root:x:0:0:root:/root:/bin/bash 7
+bin:x:1:1:bin:/bin:/sbin/nologin 7
+daemon:x:2:2:daemon:/sbin:/sbin/nologin 7
+adm:x:3:4:adm:/var/adm:/sbin/nologin 7
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin 7
+sync:x:5:0:sync:/sbin:/bin/sync 7
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown 7
+halt:x:7:0:halt:/sbin:/sbin/halt 7
+
+# 
+# awk -F: '/root/{print $1, $3}' /etc/passwd
+root 0
+operator 11
 # awk -F'[ :\t]' '{print $1,$2,$3}' /etc/passwd    
+root x 0
+bin x 1
+daemon x 2
+adm x 3
+lp x 4
+sync x 5
+shutdown x 6
+
 # awk 'BEGIN{FS=":"} {print $1,$3}' /etc/passwd
-OFS：   //输出字段分隔符         # awk 'BEGIN{FS=":"; OFS="+++"} /^root/{print $1,$2,$3,$4}' passwd
-RS      //输入记录分隔符，默认情况下为换行。 # awk -F: 'BEGIN{RS=" "} {print $0}' a.txt #用空格取代换行符，完成换行，打印输出。
-ORS     //输出记录分隔符，默认情况下为换行。  # awk -F: 'BEGIN{ORS=""} {print $0}' passwd
+root 0
+bin 1
+daemon 2
+# awk 'BEGIN{FS=":"; OFS="+++"} /^root/{print $1,$2,$3,$4}' /etc/passwd
+root+++x+++0+++0
+# awk -F: 'BEGIN{RS=" "} {print $0}' a.txt #用空格取代换行符，完成换行，打印输出。
+# awk -F: 'BEGIN{ORS=""} {print $0}' passwd
+```
 
 ①、区别：
 
@@ -96,16 +172,20 @@ root
 [root@linux ~]# awk 'BEGIN{RS=":"} {print $0}' passwd1 |grep -v '^$' > passwd2
 
 
-(五)、格式化输出：
+### 格式化输出
 ①、print函数
-# date |awk '{print "Month: " $2 "\nYear: " $NF}' 变量放在双引号外面，
+```shell
+# date |awk '{print "Month: " $2 "\nYear: " $NF}' #变量放在双引号外面
 # awk -F: '{print "username is: " $1 "\t uid is: " $3}' /etc/passwd
 # awk -F: '{print "\tusername and uid: " $1,$3}' /etc/passwd
+```
 \t 同意对齐格式：
 
 ②、printf函数
+```shell
 # awk -F: '{printf "%-15s %-10s %-15s\n", $1,$2,$3}'  /etc/passwd
 # awk -F: '{printf "|%-15s| %-10s| %-15s|\n", $1,$2,$3}' /etc/passwd
+```
 \n 换行
 
 %s 字符类型
@@ -115,19 +195,19 @@ root
 - 表示左对齐，默认是右对齐
   printf默认不会在行尾自动换行，加\n
 
-补充点
+### 补充点
 
-关于printf命令
+#### printf命令
 
 其格式化输出：printf FORMAT,item1,item2....
-要点：
-1、其与print命令最大不同是，printf需要指定format
-2、printf后面的字串定义内容需要使用双引号引起来
-3、字串定义后的内容需要使用","分隔，后面直接跟Item1,item2....
-4、format用于指定后面的每个item的输出格式
-5、printf语句不会自动打印换行符，\n
+要点： 
+1. 其与print命令最大不同是，printf需要指定format
+2. printf后面的字串定义内容需要使用双引号引起来
+3. 字串定义后的内容需要使用","分隔，后面直接跟Item1,item2....
+4. format用于指定后面的每个item的输出格式
+5. printf语句不会自动打印换行符，\n
 
-格式符
+#### 格式符
 %c: 显示字符的ASCII码
 %d,%i : 显示十进制整数
 %e,%E: 科学计数法数值显示
@@ -137,39 +217,113 @@ root
 %u: 无符号整数
 %%: 显示%号自身，相当于转义
 
-修饰符
+#### 修饰符
 N : 显示宽度
 - : 左对齐（默认为右对齐）
 + : 显示数值符号
 
 示例：
+```shell
 awk -F: '{printf "%s\n",$1}' /etc/fstab
 awk -F: '{printf "username: %s,UID:%d\n",$1,$3}' /etc/passwd
 awk -F: '{printf "username: %-20s shell: %s\n",$1,$NF}' /etc/passwd
 free -m | awk 'BEGIN{printf "%.1f\n",'$((10000-28))'/10/12}'
+```
 
 
-(六)、awk 工作模式和动作
+## awk 工作模式和动作
 　　任何awk 语句都由模式和动作组成，模式部分决定动作语句何时触发及触发事件，处理即对数据进行的操作。
 
 如果省略模式部分，动作将时刻保持执行状态，模式可以是任何条件语句或复合语句或正则表达式，模式包括两个
 特殊字段BEGIN和END，使用BEGIN语句设置计数和打印头，BEGIN语句使用在任何文本浏览动作之前，之后文本浏览
 动作依据输入文本开始执行，END语句用来在awk完成文本浏览动作后打印输出文本总数和结尾状态；
 
-①、正则表达式：
+#### 正则表达式
 
-匹配记录（整行）：
+匹配记录（整行）
 
-# awk '/^alice/'  /etc/passwd
-# awk '$0 ~ /^alice/'  /etc/passwd
-# awk '!/alice/' passwd
-# awk '$0 !~ /^alice/'  /etc/passwd
+语法格式：
+```text
+ awk '条件/关键字/' file
+```
+
+```shell
+//纯字符匹配   !//纯字符不匹配   ~//字段值匹配    !~//字段值不匹配   ~/a1|a2/字段值匹配a1或a2 
+
+匹配alice关键字整行输出  
+# awk '/alice/' /etc/passwd
+# awk '/alice/{print }' /etc/passwd
+# awk '/alice/{print $0}' /etc/passwd                   #三条指令结果一样
+alice:x:1000:1000::/home/alice:/bin/bash
+
+匹配除了alice关键字整行输出
+# awk '!/alice/{print $0}' /etc/passwd                  //输出不匹配alice的行
+
+匹配alice或mail关键字，整行输出
+# awk '/alice|mail/{print}' /etc/passwd
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+alice:x:1000:1000::/home/alice:/bin/bash
+
+匹配排除alice或mail关键字，整行输出
+# awk '!/alice|mail/{print}' /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+
+匹配alice和mail区间关键字整行输出
+# awk -F: '/mail/,/alice/{print}' /etc/passwd 
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+operator:x:11:0:operator:/root:/sbin/nologin
+games:x:12:100:games:/usr/games:/sbin/nologin
+ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+nobody:x:99:99:Nobody:/:/sbin/nologin
+systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+dbus:x:81:81:System message bus:/:/sbin/nologin
+polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+clickhouse:x:998:996::/nonexistent:/bin/false
+nginx:x:997:995:nginx user:/var/cache/nginx:/sbin/nologin
+nms:x:996:994:nms user added by manager:/nonexistent:/bin/false
+alice:x:1000:1000::/home/alice:/bin/bash
+
+匹配包含27为数字开头的行，如27，277，2777...
+# awk '/[2][7][7]*/{print $0}' /etc/passwd 
+27test:x:1001:1001::/home/27test:/bin/bash
+276test:x:1004:1004::/home/276test:/bin/bash
+27777test:x:1005:1005::/home/27777test:/bin/bash
+
+
+```
 
 匹配字段：匹配操作符（~ !~）
-# awk -F: '$1 ~ /^alice/'  /etc/passwd
-# awk -F: '$NF !~ /bash$/'  /etc/passwd
+```shell
+$1匹配指定内容输出
+# awk -F: '{if($1~/mail/) print $1}' /etc/passwd #等同下
+# awk -F: '$1~/mail/{print $1}' /etc/passwd
+mail
 
-②、比较表达式：
+$1不匹配指定内容包含mail关键字输出
+# awk -F: '$1!~/mail/{print $1}' /etc/passwd  # 等同下
+postfix
+clickhouse
+nginx
+nms
+alice
+
+$1不匹配指定内容包含mail和alice关键字输出
+# awk -F: '$1!~/mail|alice/{print $1}' /etc/passwd 
+postfix
+clickhouse
+nginx
+nms
+test
+```
+
+#### 条件表达式
 
 比较表达采用对文本进行比较，只当条件为真，才执行指定的动作，比较表达式使用关系运算符，用于比较数字与字符串；
 
@@ -183,38 +337,46 @@ free -m | awk 'BEGIN{printf "%.1f\n",'$((10000-28))'/10/12}'
 >=              大于等于                    　　x>=y
 >               大于                            x>y
 
-$NF:匹配条件判断后，输出文件的最后一行
-
-# awk -F: '$3 == 0' /etc/passwd
-# awk -F: '$3 < 10' /etc/passwd
-# awk -F: '$NF == "/bin/bash"' /etc/passwd
-# awk -F: '$1 == "alice"' /etc/passwd
-# awk -F: '$1 ~ /alic/ ' /etc/passwd
-# awk -F: '$1 !~ /alic/ ' /etc/passwd
-# df -P | grep  '/' |awk '$4 > 25000'
 
 条件表达式：
 
-# awk -F: '$3>300 {print $0}' /etc/passwd
-# awk -F: '{ if($3>300) print $0 }' /etc/passwd
-# awk -F: '{ if($3>300) {print $0} }' /etc/passwd
-# awk -F: '{ if($3>300) {print $3} else{print $1} }' /etc/passwd
+```shell
+awk -F":" '$1=="mysql"{print $3}' /etc/passwd  
+awk -F":" '{if($1=="mysql") print $3}' /etc/passwd          //与上面相同 
+awk -F":" '$1!="mysql"{print $3}' /etc/passwd                 //不等于
+awk -F":" '$3>1000{print $3}' /etc/passwd                      //大于
+awk -F":" '$3>=100{print $3}' /etc/passwd                     //大于等于
+awk -F":" '$3<1{print $3}' /etc/passwd                            //小于
+awk -F":" '$3<=1{print $3}' /etc/passwd                         //小于等于
+```
 
-算术运算：+ - * / %(模) ^(幂2^3)
+算术运算：
+
++ - * / %(模) ^(幂2^3)
 
 可以在模式中执行计算，awk 都将按浮点方式执行算术运算
 
+```shell
 # awk -F: '$3 * 10 > 500' /etc/passwd
 # awk -F: '{ if($3*10>500){print $0} }' /etc/passwd
+```
 
 逻辑操作符和复合模式：
 
-&&       	 逻辑与        a&&b
-||           逻辑或        a||b
-!            逻辑非        !a
+| 名称 | 注释  | 示例      |
+|---|-----|---------|
+| && | 逻辑与 | a&&b    |
+| ||     |   逻辑或 |  a||b |
+| ! | 逻辑非 | !a      |
+
+
+示例：
+```shell
 # awk -F: '$1~/root/ && $3<=15' /etc/passwd
 # awk -F: '$1~/root/ || $3<=15' /etc/passwd
 # awk -F: '!($1~/root/ || $3<=15)' /etc/passwd
+```
+
 
 范围模式：
 
@@ -255,6 +417,7 @@ $NF:匹配条件判断后，输出文件的最后一行
 
 (二)、awk 进阶：
 
+```shell
 [root@yang ~]# cat << eof >b.txt
 yang sheng:is a::good boy!
 eof
@@ -266,7 +429,6 @@ eof
 7
 [root@yang ~]# awk -F"[ :]+" '{print NF}' b.txt
 6
-
 # awk '$7 < 5 {print $4, $7}' datafile                      #{if($7<5){print $4,$7}}
 # awk '$6 > .9 {print $1,$6}' datafile
 # awk '$8 <= 17 {print $8}' datafile
@@ -292,6 +454,7 @@ eof
 # awk '/Derek/ {$8+=12; print $8}' datafile                            //$8 += 12等价于$8 = $8 + 12
 # awk '{$7%=3; print $7}' datafile                                        //$7 %= 3等价于$7 = $7 % 3
 
+```
 
 
 
