@@ -26,11 +26,11 @@ command：
      BEGIN{}            {}               END{}
     命令行处理前      命令行处理中         命令行处理后
 ' '          引用代码块
-BEGIN{}        初始化代码块，在对每一行进行处理之前，初始化代码，主要是引用全局变量，设置FS分隔符
+BEGIN{}      初始化代码块，在对每一行进行处理之前，初始化代码，主要是引用全局变量，设置FS分隔符
 //           用来定义需要匹配的模式（字符串或者正则表达式），对满足匹配模式的行进行上条代码块的操作
 {}           命令代码块，包含一条或多条命令
 ;            多条命令使用分号分隔
-END{}          结尾代码块，在对每一行进行处理之后再执行的代码块，主要是进行最终计算或输出结尾摘要信息
+END{}        结尾代码块，在对每一行进行处理之后再执行的代码块，主要是进行最终计算或输出结尾摘要信息
 ```
 示例：
 ```shell
@@ -53,8 +53,6 @@ command | awk 'pattern {action}'       //示例：df -P| grep  '/' |awk '$4 > 25
 ```
 
 
-
-
 ## 工作原理
 ```shell
 # awk -F: '{print $1,$3}' /etc/passwd
@@ -70,26 +68,36 @@ $1 $2 $3 $4 $5   $6    $7
 #### -F指定分隔符
 
 内部变量
+## 内建变量
 
-| 变量名 | 注释                       |
-| ------ |--------------------------|
-| $0     | 当前记录的内容                  |
-| NR     | 在每行行首添加输入记录的行号           |
-| FNR    | 当前输入文件中的输入记录号            |
-| NF     | 保存记录每行的列数，$1,$2...$100 |
-| FS     | 输入字段分隔符，默认空格             |
-| OFS    | 输出字段分隔符                  |
-| RS     | 输入记录分隔符，默认情况下为换行         |
-| ORS    | 输出记录分隔符，默认情况下为换行         |
-| $1     | 每行第一个字段                  |
-| FILENAME      | awk读取的文件名                |
-| $1     | 每行第一个字段                  |
-| $1     | 每行第一个字段                  |
-          
+| 变量        | 描述                                                       |
+| :---------- | :--------------------------------------------------------- |
+| $n          | 当前记录的第n个字段，字段间由FS分隔                        |
+| $0          | 完整的输入记录                                             |
+| ARGC        | 命令行参数的数目                                           |
+| ARGIND      | 命令行中当前文件的位置(从0开始算)                          |
+| ARGV        | 包含命令行参数的数组                                       |
+| CONVFMT     | 数字转换格式(默认值为%.6g)ENVIRON环境变量关联数组          |
+| ERRNO       | 最后一个系统错误的描述                                     |
+| FIELDWIDTHS | 字段宽度列表(用空格键分隔)                                 |
+| FILENAME    | 当前文件名                                                 |
+| FNR         | 各文件分别计数的行号                                       |
+| FS          | 字段分隔符(默认是任何空格)                                 |
+| IGNORECASE  | 如果为真，则进行忽略大小写的匹配                           |
+| NF          | 一条记录的字段的数目                                       |
+| NR          | 已经读出的记录数，就是行号，从1开始                        |
+| OFMT        | 数字的输出格式(默认值是%.6g)                               |
+| OFS         | 输出记录分隔符（输出换行符），输出时用指定的符号代替换行符 |
+| ORS         | 输出记录分隔符(默认值是一个换行符)                         |
+| RLENGTH     | 由match函数所匹配的字符串的长度                            |
+| RS          | 记录分隔符(默认是一个换行符)                               |
+| RSTART      | 由match函数所匹配的字符串的第一个位置                      |
+| SUBSEP      | 数组下标分隔符(默认值是/034)                               |
 
 示例：
 ```shell
 
+ 以冒号: 作为分隔符，获取文件/etc/passwd中信息，打印输出
 # awk -F: '{print $0}' /etc/passwd
 root:x:0:0:root:/root:/bin/bash
 bin:x:1:1:bin:/bin:/sbin/nologin
@@ -98,6 +106,7 @@ adm:x:3:4:adm:/var/adm:/sbin/nologin
 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
 sync:x:5:0:sync:/sbin:/bin/sync
 
+每行的开头输出行号和内容
 # awk -F: '{print NR, $0}' /etc/passwd
 1 root:x:0:0:root:/root:/bin/bash
 2 bin:x:1:1:bin:/bin:/sbin/nologin
@@ -106,8 +115,7 @@ sync:x:5:0:sync:/sbin:/bin/sync
 5 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
 6 sync:x:5:0:sync:/sbin:/bin/sync
 
-# awk -F: '{print FNR}' /etc/passwd /etc/hosts
-
+将每行第NF个字段的值打印出来
 # awk -F: '{print $0,NF}' /etc/passwd
 root:x:0:0:root:/root:/bin/bash 7
 bin:x:1:1:bin:/bin:/sbin/nologin 7
@@ -118,11 +126,31 @@ sync:x:5:0:sync:/sbin:/bin/sync 7
 shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown 7
 halt:x:7:0:halt:/sbin:/sbin/halt 7
 
-# 
+$1与$3相连输出，不分隔
+awk -F":" '{print $1 $3}'  /etc/passwd  
+root0
+bin1
+daemon2
+adm3
+lp4
+sync5
+
+以冒号: 作为分隔符，获取文件/etc/passwd中信息，输出第1列与第3列信息，中间使用空格分隔
+# awk -F":" '{print $1 " " $3}'  /etc/passwd  #$1与$3之间手动添加空格分隔
+# awk -F":" '{print $1,$3}'  /etc/passwd  #等同上
+root 0
+bin 1
+daemon 2
+adm 3
+lp 4
+
+ 以冒号: 作为分隔符，获取文件/etc/passwd中，匹配root关键字的行，输出每行的第一列和第三列。注意：$1与$3使用空格分隔
 # awk -F: '/root/{print $1, $3}' /etc/passwd
 root 0
 operator 11
-# awk -F'[ :\t]' '{print $1,$2,$3}' /etc/passwd    
+
+以冒号: 作为分隔符，获取文件/etc/passwd中，匹配空格，冒号和制表符关键字的行，输出每行的第一列和第三列。注意：$1与$3使用空格分隔
+# awk -F'[ :\t]' '{print $1,$3}' /etc/passwd    
 root x 0
 bin x 1
 daemon x 2
@@ -131,46 +159,91 @@ lp x 4
 sync x 5
 shutdown x 6
 
+以冒号: 作为分隔符，获取文件/etc/passwd中信息，显示每行有多少字段数
+# awk -F: '{print NF}' /etc/passwd     
+7
+7
+
+以冒号: 作为分隔符，获取文件/etc/passwd中信息，将每行第NF个字段的值打印出来
+# awk -F: '{print $NF}' /etc/passwd  
+/bin/bash
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/sbin/nologin
+/bin/sync
+
+以冒号: 作为分隔符，获取文件/etc/passwd中信息，显示第5行数据
+# awk -F: 'NR==5{print}'  /etc/passwd                         
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+
+以冒号: 作为分隔符，获取文件/etc/passwd中信息，显示第5行和第6行
+#awk -F: 'NR==5 || NR==6{print}'  /etc/passwd 
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+
+以冒号: 作为分隔符，获取文件/etc/passwd中数据，输出每行的第一列和第三列。注意：$1与$3使用空格分隔
 # awk 'BEGIN{FS=":"} {print $1,$3}' /etc/passwd
 root 0
 bin 1
 daemon 2
-# awk 'BEGIN{FS=":"; OFS="+++"} /^root/{print $1,$2,$3,$4}' /etc/passwd
-root+++x+++0+++0
-# awk -F: 'BEGIN{RS=" "} {print $0}' a.txt #用空格取代换行符，完成换行，打印输出。
-# awk -F: 'BEGIN{ORS=""} {print $0}' passwd
+
+以冒号: 作为分隔符，获取文件/etc/passwd中数据，匹配root关键字的行，将冒号:替换成+++输出每行的第一列和第三列。注意：$1与$3使用空格分隔
+# awk 'BEGIN{FS=":"; OFS="+++"} /^root/{print $1,$3}' /etc/passwd
+root+++0
+
+用空格取代换行符，完成换行，打印输出。
+# awk -F: 'BEGIN{ORS=""} {print $0}' /etc/passwd
+root:x:0:0:root:/root:/bin/bashbin:x:1:1:bin:/bin:/sbin/nologindaemon:x:2:2:daemon:/sbin:/sbin/nologinadm:x:3:4:adm:/var/adm:/sbin/nologinlp:x:4:7:lp:/var/spool/lpd:/sbin/nologinsync:x:5:0:sync:/sbin:/bin/syncshutdown:x:6:0:shutdown:/sbin:/sbin/shutdownhalt:x:7:0:halt:/sbin:/sbin/halt
 ```
 
-①、区别：
+### FS&RS区别
 
 ```text
 字段分割符：FS OFS 　 默认空格或制表符
 记录分割符：RS ORS　　默认换行符
 ```
 
-lab1:
-```shell
-[root@linux ~]# awk 'BEGIN{ORS=" "} {print $0}' /etc/passwd                 //#将文件每一行合并为一行,即ORS默认输出一条记录应该回车，加了一个空格
 
-```
-lab2:
+### awk 使用外部变量
+
+方法一：在双引号的情况下使用
 ```shell
-[root@linux ~]# head -1 /etc/passwd > passwd1
-[root@linux ~]# cat passwd1
+[root@linux ~]# var="bash"
+[root@linux ~]# echo "unix script" |awk "gsub(/unix/,\"$var\")"
+bash script
+```
+方法二：在单引号的情况下使用
+
+```shell
+[root@linux ~]# var="bash"
+[root@linux ~]# echo "unix script" |awk 'gsub(/unix/,"'"$var"'")'
+bash script
+
+
+[root@linux ~]# df -h
+Filesystem           Size  Used Avail Use% Mounted on
+/dev/mapper/cl-root  2.8T  246G  2.5T   9% /
+tmpfs                 24G   20K   24G        1% /dev/shm
+/dev/sda2           1014M  194M  821M   20% /boot
+
+[root@linux ~]# df -h |awk '{ if(int($5)>5){print $6":"$5} }'
+/:9%
+/boot:20%
+
+[root@linux ~]# i=10
+[root@linux ~]# df -h |awk '{ if(int($5)>'''$i'''){print $6":"$5} }'
+/boot:20%
+```
+
+方法：awk 参数-v(建议)
+```shell
+[root@linux ~]# echo "unix script" |awk -v var="bash" 'gsub(/unix/,var)'
+bash script
+
+[root@linux ~]# awk -v user=root  -F: '$1 == user' /etc/passwd
 root:x:0:0:root:/root:/bin/bash
-[root@linux ~]#
-[root@linux ~]# awk 'BEGIN{RS=":"} {print $0}' passwd1
-root
-x
-0
-0
-root
-/root
-/bin/bash
 ```
-
-[root@linux ~]# awk 'BEGIN{RS=":"} {print $0}' passwd1 |grep -v '^$' > passwd2
-
 
 ### 格式化输出
 ①、print函数
@@ -208,6 +281,7 @@ root
 5. printf语句不会自动打印换行符，\n
 
 #### 格式符
+```shell
 %c: 显示字符的ASCII码
 %d,%i : 显示十进制整数
 %e,%E: 科学计数法数值显示
@@ -216,11 +290,14 @@ root
 %s: 显示字符串
 %u: 无符号整数
 %%: 显示%号自身，相当于转义
+```
 
 #### 修饰符
+```shell
 N : 显示宽度
 - : 左对齐（默认为右对齐）
 + : 显示数值符号
+```
 
 示例：
 ```shell
@@ -230,13 +307,6 @@ awk -F: '{printf "username: %-20s shell: %s\n",$1,$NF}' /etc/passwd
 free -m | awk 'BEGIN{printf "%.1f\n",'$((10000-28))'/10/12}'
 ```
 
-
-## awk 工作模式和动作
-　　任何awk 语句都由模式和动作组成，模式部分决定动作语句何时触发及触发事件，处理即对数据进行的操作。
-
-如果省略模式部分，动作将时刻保持执行状态，模式可以是任何条件语句或复合语句或正则表达式，模式包括两个
-特殊字段BEGIN和END，使用BEGIN语句设置计数和打印头，BEGIN语句使用在任何文本浏览动作之前，之后文本浏览
-动作依据输入文本开始执行，END语句用来在awk完成文本浏览动作后打印输出文本总数和结尾状态；
 
 #### 正则表达式
 
@@ -295,8 +365,6 @@ alice:x:1000:1000::/home/alice:/bin/bash
 27test:x:1001:1001::/home/27test:/bin/bash
 276test:x:1004:1004::/home/276test:/bin/bash
 27777test:x:1005:1005::/home/27777test:/bin/bash
-
-
 ```
 
 匹配字段：匹配操作符（~ !~）
@@ -327,47 +395,95 @@ test
 
 比较表达采用对文本进行比较，只当条件为真，才执行指定的动作，比较表达式使用关系运算符，用于比较数字与字符串；
 
-关系运算符
+##### 关系运算符
 
-运算符           含义                          示例
-<               小于                            x<y
-<=              小于或等于                　　　 x<=y
-==              等于                            x==y
-!=              不等于                        　x!=y
->=              大于等于                    　　x>=y
->               大于                            x>y
+| 运算符 |   含义   |   示例  |
+|-----|-----|-----|
+| <   |  小于    |     x<y |
+| <=  |  小于或等于   |  x<=y   |
+| ==  |   等于   |    x==y  |
+| !=  |   不等于  |   x!=y  |
+| >=  |  大于等于   |    x>=y |
+| \>  |  大于   |      x>y |
 
 
-条件表达式：
+条件表达式
 
 ```shell
-awk -F":" '$1=="mysql"{print $3}' /etc/passwd  
-awk -F":" '{if($1=="mysql") print $3}' /etc/passwd          //与上面相同 
-awk -F":" '$1!="mysql"{print $3}' /etc/passwd                 //不等于
-awk -F":" '$3>1000{print $3}' /etc/passwd                      //大于
-awk -F":" '$3>=100{print $3}' /etc/passwd                     //大于等于
-awk -F":" '$3<1{print $3}' /etc/passwd                            //小于
-awk -F":" '$3<=1{print $3}' /etc/passwd                         //小于等于
+以冒号: 作为分隔符，获取文件/etc/passwd中，每行第一列关键字，如果是mysql，打印每行第三列的数据 
+# awk -F":" '$1=="mysql"{print $3}' /etc/passwd  
+# awk -F":" '{if($1=="mysql") print $3}' /etc/passwd          //与上面相同 
+1006
+
+以冒号: 作为分隔符，获取文件/etc/passwd中，每行第一列关键字，如果不是mysql，打印每行第三列的数据 
+# awk -F":" '$1!="mysql"{print $3}' /etc/passwd                 //不等于
+0
+1
+2
+3
+以冒号: 作为分隔符，获取文件/etc/passwd中，每行第3列的用户ID，如果用户ID大于1000，打印每行第3列的用户ID
+# awk -F":" '$3>1000{print $3}' /etc/passwd                      //大于
+1001
+1002
+1003
+1004
+1005
+1006
+以冒号: 作为分隔符，获取文件/etc/passwd中，每行第3列的用户ID，如果用户ID大于等于100，打印每行第3列的用户ID
+# awk -F":" '$3>=100{print $3}' /etc/passwd                     //大于等于
+192
+999
+998
+997
+996
+1000
+1001
+1002
+1003
+1004
+1005
+1006
+
+以冒号: 作为分隔符，获取文件/etc/passwd中，每行第3列的用户ID，如果用户ID小于1，打印每行第3列的用户ID
+# awk -F":" '$3<1{print $3}' /etc/passwd                            //小于
+0
+
+以冒号: 作为分隔符，获取文件/etc/passwd中，每行第3列的用户ID，如果用户ID小于等于1，打印每行第3列的用户ID
+# awk -F":" '$3<=1{print $3}' /etc/passwd                         //小于等于
+0
+1
 ```
 
-算术运算：
+#### 算术运算
 
 + - * / %(模) ^(幂2^3)
 
 可以在模式中执行计算，awk 都将按浮点方式执行算术运算
 
 ```shell
+以冒号: 作为分隔符，获取文件/etc/passwd中，每行第3列的用户ID，如果用户ID乘10大于500，打印每行所有信息
 # awk -F: '$3 * 10 > 500' /etc/passwd
-# awk -F: '{ if($3*10>500){print $0} }' /etc/passwd
+nobody:x:99:99:Nobody:/:/sbin/nologin
+systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+dbus:x:81:81:System message bus:/:/sbin/nologin
+polkitd:x:999:998:User for polkitd:/:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+clickhouse:x:998:996::/nonexistent:/bin/false
+nginx:x:997:995:nginx user:/var/cache/nginx:/sbin/nologin
+nms:x:996:994:nms user added by manager:/nonexistent:/bin/false
+alice:x:1000:1000::/home/alice:/bin/bash
+
+# awk -F: '{ if($3*10>500){print $0} }' /etc/passwd #等同于上
 ```
 
 逻辑操作符和复合模式：
 
-| 名称 | 注释  | 示例      |
-|---|-----|---------|
+| 名称 | 注释 | 示例      |
+|----|----|---------|
 | && | 逻辑与 | a&&b    |
-| ||     |   逻辑或 |  a||b |
-| ! | 逻辑非 | !a      |
+|    ||  |   \逻辑或 |  a||b |
+| !  | 逻辑非 | !a      |
 
 
 示例：
@@ -376,86 +492,6 @@ awk -F":" '$3<=1{print $3}' /etc/passwd                         //小于等于
 # awk -F: '$1~/root/ || $3<=15' /etc/passwd
 # awk -F: '!($1~/root/ || $3<=15)' /etc/passwd
 ```
-
-
-范围模式：
-
-# awk '/Tom/,/Suzanne/' filename
-二、示例
-(一)、awk 示例：
-
-# awk '/west/' datafile
-# awk '/^north/' datafile
-# awk '$3 ~ /^north/' datafile
-# awk '/^(no|so)/' datafile
-# awk '{print $3,$2}' datafile
-
-# awk '{print $3 $2}' datafile
-# awk '{print $0}' datafile
-# awk '{print "Number of fields: "NF}' datafile
-# awk '/northeast/{print $3,$2}' datafile
-# awk '/E/' datafile
-
-# awk '/^[ns]/{print $1}' datafile
-# awk '$5 ~ /\.[7-9]+/' datafile
-# awk '$2 !~ /E/{print $1,$2}' datafile
-# awk '$3 ~ /^Joel/{print $3 " is a nice boy."}' datafile
-# awk '$8 ~ /[0-9][0-9]$/{print $8}' datafile
-
-# awk '$4 ~ /Chin$/{print "The price is $" $8 "."}' datafile
-# awk '/Tj/{print $0}' datafile
-# awk '{print $1}' /etc/passwd
-# awk -F: '{print $1}' /etc/passwd
-# awk '{print "Number of fields: "NF}' /etc/passwd
-# awk -F: '{print "Number of fields: "NF}' /etc/passwd
-# awk -F"[ :]" '{print NF}' /etc/passwd
-# awk -F"[ :]+" '{print NF}' /etc/passwd
-# awk '$7 == 5' datafile
-# awk '$2 == "CT" {print $1, $2}' datafile
-# awk '$7 != 5' datafile
-
-
-(二)、awk 进阶：
-
-```shell
-[root@yang ~]# cat << eof >b.txt
-yang sheng:is a::good boy!
-eof
-[root@yang ~]# awk '{print NF}' b.txt
-4
-[root@yang ~]# awk -F: '{print NF}' b.txt
-4
-[root@yang ~]# awk -F"[ :]" '{print NF}' b.txt
-7
-[root@yang ~]# awk -F"[ :]+" '{print NF}' b.txt
-6
-# awk '$7 < 5 {print $4, $7}' datafile                      #{if($7<5){print $4,$7}}
-# awk '$6 > .9 {print $1,$6}' datafile
-# awk '$8 <= 17 {print $8}' datafile
-# awk '$8 >= 17 {print $8}' datafile
-# awk '$8 > 10 && $8 < 17' datafile
-
-# awk '$2 == "NW" || $1 ~ /south/ {print $1, $2}' datafile
-# awk '!($8 == 13){print $8}' datafile                    #$8 != 13
-# awk '/southem/{print $5 + 10}' datafile
-# awk '/southem/{print $8 + 10}' datafile
-# awk '/southem/{print $5 + 10.56}' datafile
-
-# awk '/southem/{print $8 - 10}' datafile
-# awk '/southem/{print $8 / 2 }' datafile
-# awk '/southem/{print $8 / 3 }' datafile
-# awk '/southem/{print $8 * 2 }' datafile
-# awk '/southem/{print $8 % 2 }' datafile
-
-# awk '$3 ~ /^Suan/ {print "Percentage: "$6 + .2   " Volume: " $8}' datafile
-# awk '/^western/,/^eastern/' datafile
-# awk '{print ($7 > 4 ? "high "$7 : "low "$7)}' datafile            //三目运算符 a?b:c 条件?结果1:结果2
-# awk '$3 == "Chris" {$3 = "Christian"; print $0}' datafile     //赋值运算符
-# awk '/Derek/ {$8+=12; print $8}' datafile                            //$8 += 12等价于$8 = $8 + 12
-# awk '{$7%=3; print $7}' datafile                                        //$7 %= 3等价于$7 = $7 % 3
-
-```
-
 
 
 ## 条件判断
@@ -470,8 +506,13 @@ eof
 
 示例：
 ```shell
-awk -F: '{if($3==0) {print $1 " is administrator."}}' /etc/passwd //查找root用户
-awk -F: '{if($3>0 && $3<1000){count++;}}  END{print count}' /etc/passwd    　　//统计系统用户数
+查找root用户
+# awk -F: '{if($3==0) {print $1 " is administrator."}}' /etc/passwd
+root is administrator.
+
+统计系统用户数
+# awk -F: '{if($3>0 && $3<1000){count++;}}  END{print count}' /etc/passwd   
+20　　
 ```
 
 ### if...else语句
@@ -483,9 +524,24 @@ else{动作;动作;...}
 ```
 示例：
 ```shell
-awk -F: '{if($3==0){print $1} else {print $7}}' /etc/passwd
-awk -F: '{if($3==0) {count++} else{i++} }' /etc/passwd
-awk -F: '{if($3==0){count++} else{i++}} END{print "管理员个数: "count ; print "系统用户数: "i}' /etc/passwd
+以冒号: 作为分隔符，获取文件/etc/passwd中，每行第3列的用户ID，如果用户ID等于0，打印每行第1列的用户，否则，打印输出每行第7列的用户默认的命令解释器的路径
+# awk -F: '{if($3==0){print $1} else {print $7}}' /etc/passwd
+root
+/sbin/nologin
+/sbin/nologin
+/bin/sync
+/sbin/shutdown
+/sbin/halt
+/sbin/nologin
+/bin/false
+/sbin/nologin
+/bin/false
+/bin/bash
+
+获取管理员和系统用户数总数
+# awk -F: '{if($3==0){count++} else{i++}} END{print "管理员个数: "count ; print "系统用户数: "i}' /etc/passwd
+管理员个数: 1
+系统用户数: 27
 ```
 
 ### if...else if...else语句
@@ -510,15 +566,54 @@ awk -F: '{if($3==0){i++} else if($3>999){k++} else{j++}} END{print "管理员个
 ### while
 示例：
 ```shell
-[root@linux ~]# awk 'BEGIN{ i=1; while(i<=10){print i; i++}  }'
-[root@linux ~]# awk -F: '/^root/{i=1; while(i<=7){print $i; i++}}' passwd
-[root@linux ~]# awk  '{i=1; while(i<=NF){print $i; i++}}' /etc/hosts
-[root@linux ~]# awk -F: '{i=1; while(i<=10) {print $0;  i++}}' /etc/passwd       //将每行打印10次
-[root@linux ~]# cat b.txt
-111 222
-333 444 555
-666 777 888 999
-[root@linux ~]# awk '{i=1; while(i<=NF){print $i; i++}}' b.txt                       //分别打印每行的每列
+打印1到10
+# awk 'BEGIN{ i=1; while(i<=10){print i; i++}  }'
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+以冒号: 作为分隔符，获取文件/etc/passwd中，循环打印以root开头的每行的列信息
+# awk -F: '/^root/{i=1; while(i<=7){print $i; i++}}'/etc/passwd 
+root
+x
+0
+0
+root
+/root
+/bin/bash
+
+分别打印每行的每列
+# awk  '{i=1; while(i<=NF){print $i; i++}}' /etc/hosts
+127.0.0.1
+localhost
+localhost.localdomain
+localhost4
+localhost4.localdomain4
+::1
+localhost
+localhost.localdomain
+localhost6
+localhost6.localdomain6
+
+以冒号: 作为分隔符，获取文件/etc/passwd中数据每行打印10次
+# awk -F: '{i=1; while(i<=10) {print $0;  i++}}' /etc/passwd       
+root:x:0:0:root:/root:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+root:x:0:0:root:/root:/bin/bash
 
 ```
 
@@ -548,23 +643,15 @@ awk -F: '{ for(i=1;i<=NF;i++) {print $i} }' passwd        //分别打印每行�
 AWK 可以使用关联数组这种数据结构，索引可以是数字或字符串。
 AWK关联数 组也不需要提前声明其大小，因为它在运行时可以自动的增大或减小。
 
-数组使用的语法格式：
-
-	array_name[index]=value
-
-	array_name：数组的名称
-	index：数组索引
-	value：数组中元素所赋予的值
-
-创建数组
-
 接下来看一下如何创建数组以及如何访问数组元素：
+```shell
 awk 'BEGIN {
 sites["runoob"]="www.runoob.com";
 sites["google"]="www.google.com"
 print sites["runoob"] "\n" sites["google"]
 }'
-
+```
+示例
 ```shell
 # awk -F: '{username[++i]=$1} END{print username[1]}' /etc/passwd #$1赋值给usernamei
 root
@@ -582,9 +669,7 @@ root
 # awk -F: '{username[x++]=$1} END{for(i in username) {print i,username[i]} }' /etc/passwd
 # awk -F: '{username[++x]=$1} END{for(i in username) {print i,username[i]} }' /etc/passwd
 ```
-
 将用户名保存到数组当中，然后对数组遍历，i是索引
-注：变量i是索引
 
 ２．按元数个数遍历
 
@@ -594,14 +679,23 @@ root
 
 ```
 
-四、实例练习
-(一)、统计shell
-<统计/etc/passwd中各种类型shell的数量>
+## 实例练习
+### 统计shell
 
-[root@linux ~]# awk -F: '{shells[$NF]++} END{ for(i in shells){print i,shells[i]} }' /etc/passwd
+统计/etc/passwd中各种类型shell的数量
+```shell
+# awk -F: '{shells[$NF]++} END{ for(i in shells){print i,shells[i]} }' /etc/passwd
+/bin/sync 1
+/bin/bash 8
+/sbin/nologin 15
+/sbin/halt 1
+/bin/false 2
+/sbin/shutdown 1
+```
 
-(二)、网站访问状态统计
-<当前实时状态netstat>
+### 网站访问状态统计
+当前实时状态netstat
+```shell
 netstat -ant |grep :80 |awk '{access_stat[$NF]++} END{for(i in access_stat ){print i,access_stat[i]}}'
 
 netstat -ant |grep :80 |awk '{access_stat[$NF]++} END{for(i in access_stat ){print i,access_stat[i]}}' |sort -k2 -n |head
@@ -610,21 +704,26 @@ ss -an |grep :80 |awk '{access_stat[$2]++} END{for(i in access_stat){print i,acc
 
 ss -an |grep :80 |awk '{access_stat[$2]++} END{for(i in access_stat){print i,access_stat[i]}}' |sort -k2 -rn
 
+```
 
-(三)、统计当前访问的每个IP的数量
-<当前实时状态netstat，ss>
+### 统计当前访问的每个IP的数量
+当前实时状态netstat，ss
+```shell
 netstat -ant |grep :80 |awk -F: '{ip_count[$8]++} END{for(i in ip_count){print i,ip_count[i]} }' |sort
 
 ss -an |grep :80 |awk -F":" '!/LISTEN/{ip_count[$(NF-1)]++} END{for(i in ip_count){print i,ip_count[i]}}' |sort -k2 -rn |head
 
-(四)、统计Apache/Nginx日志PV量
-<统计Apache/Nginx日志中某一天的PV量，统计日志>
+```
+### 统计Apache/Nginx日志PV量
+统计Apache/Nginx日志中某一天的PV量，统计日志
+```shell
 grep '22/Mar/2017' cd.mobiletrain.org.log |wc -l
+```
 
 
-(五)、统计Apache/Nginx日志
-<统计Apache/Nginx日志中某一天不同IP的访问量，日志统计>
-
+### 统计Apache/Nginx日志
+统计Apache/Nginx日志中某一天不同IP的访问量，日志统计
+```shell
 grep '07/Aug/2012' access.log |awk '{ips[$1]++} END{for(i in ips){print i,ips[i]} }' |sort -k2 -rn |head
 
 grep '07/Aug/2012' access.log |awk '{ips[$1]++} END{for(i in ips){print i,ips[i]} }' |awk '$2>100' |sort -k2 -rn
@@ -633,12 +732,13 @@ awk '/22\/Mar\/2017/{ips[$1]++} END{for(i in ips){print i,ips[i]}}' sz.mobiletra
 
 awk '/22\/Mar\/2017/{ips[$1]++} END{for(i in ips){if(ips[i]>100){print i,ips[i]}}}' sz.mobiletrain.org.log|sort -k2 -rn|head
 
-思路：将需要统计的内容（某一个字段）作为数组的索引++
+```
 
-(六)、awk 函数
-统计用户名为４个字符的用户：
+### 统计用户名为４个字符的用户
 
-[root@linux ~]# awk -F: '$1~/^....$/{count++; print $1} END{print "count is: " count}' /etc/passwd
+```shell
+方法一：
+# awk -F: '$1~/^....$/{count++; print $1} END{print "count is: " count}' /etc/passwd
 root
 sync
 halt
@@ -653,7 +753,8 @@ dbus
 jack
 count is: 12
 
-[root@linux ~]#  awk -F: 'length($1)==4{count++; print $1} END{print "count is: "count}' /etc/passwd
+方法二：
+#  awk -F: 'length($1)==4{count++; print $1} END{print "count is: "count}' /etc/passwd
 root
 sync
 halt
@@ -667,43 +768,7 @@ sshd
 dbus
 jack
 count is: 12
-
-(七)、awk 使用外部变量：
-①方法一：在双引号的情况下使用
-
-[root@linux ~]# var="bash"
-[root@linux ~]# echo "unix script" |awk "gsub(/unix/,\"$var\")"
-bash script
-②方法二：在单引号的情况下使用
-
-[root@linux ~]# var="bash"
-[root@linux ~]# echo "unix script" |awk 'gsub(/unix/,"'"$var"'")'
-bash script
+```
 
 
-[root@linux ~]# df -h
-Filesystem           Size  Used Avail Use% Mounted on
-/dev/mapper/cl-root  2.8T  246G  2.5T   9% /
-tmpfs                 24G   20K   24G        1% /dev/shm
-/dev/sda2           1014M  194M  821M   20% /boot
 
-[root@linux ~]# df -h |awk '{ if(int($5)>5){print $6":"$5} }'
-/:9%
-/boot:20%
-
-
-[root@linux ~]# i=10
-[root@linux ~]# df -h |awk '{ if(int($5)>'''$i'''){print $6":"$5} }'
-/boot:20%
-
-方法：awk 参数-v(建议)
-
-[root@linux ~]# echo "unix script" |awk -v var="bash" 'gsub(/unix/,var)'
-bash script
-
-[root@linux ~]# awk -v user=root  -F: '$1 == user' /etc/passwd
-root:x:0:0:root:/root:/bin/bash
-
-常用方法：
-head 默认为前十；
-cat a.txt | awk 'BEGIN{FS="/"}{dict[$3]++}END{for (i in dict)print dict[i],i}' | sort -r | head -20
