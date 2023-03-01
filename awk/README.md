@@ -41,23 +41,23 @@ ok
 ok
 -----------
 ```
-BEGIN{}　通常用于定义一些变量，例如BEGIN{FS=":";OFS="---"}
 
 ### awk命令格式
 ```shell
-awk 'pattern' filename                //示例：awk -F: '/root/' /etc/passwd        
-awk '{action}' filename               //示例：awk -F: '{print $1}' /etc/passwd            
-awk 'pattern {action}' filename       //示例：awk -F: '/root/{print $1,$3}' /etc/passwd        
-//示例：awk 'BEGIN{FS=":"} /root/{print $1,$3}' /etc/passwd
-command | awk 'pattern {action}'       //示例：df -P| grep  '/' |awk '$4 > 25000 {print $4}'
+awk 'pattern' filename                #示例：awk -F: '/root/' /etc/passwd        
+awk '{action}' filename               #示例：awk -F: '{print $1}' /etc/passwd            
+awk 'pattern {action}' filename       #示例：awk -F: '/root/{print $1,$3}' /etc/passwd        
+command | awk 'pattern {action}'      #示例：df -P| grep  '/' |awk '$4 > 25000 {print $4}'
 ```
 
 
 ## 工作原理
+以示例说明：
 ```shell
 # awk -F: '{print $1,$3}' /etc/passwd
 $0 root:x:0:0:root:/root:/bin/bash
-$1 $2 $3 $4 $5   $6    $7
+    $1 $2 $3 $4 $5  $6    $7
+处理文本的流程：
 ①、awk 使用一行作为输入，并将这一行赋给这内部变量$0，每行也可以成为一个记录，以换行符结束；
 ②、然后，行被：(默认为空格或制表符)分解成字段(或域)，每个字段存储在一编号的变量中，从$1开始，最多达100个字段；
 ③、awk 如何知道用空格来分割字段呢？因为有一个内部变量FS来确定字段分割符。初始时，FS赋为空格；
@@ -68,7 +68,6 @@ $1 $2 $3 $4 $5   $6    $7
 #### -F指定分隔符
 
 内部变量
-## 内建变量
 
 | 变量        | 描述                                                       |
 | :---------- | :--------------------------------------------------------- |
@@ -97,7 +96,7 @@ $1 $2 $3 $4 $5   $6    $7
 示例：
 ```shell
 
- 以冒号: 作为分隔符，获取文件/etc/passwd中信息，打印输出
+以冒号: 作为分隔符，获取文件/etc/passwd中信息，打印输出
 # awk -F: '{print $0}' /etc/passwd
 root:x:0:0:root:/root:/bin/bash
 bin:x:1:1:bin:/bin:/sbin/nologin
@@ -106,7 +105,7 @@ adm:x:3:4:adm:/var/adm:/sbin/nologin
 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
 sync:x:5:0:sync:/sbin:/bin/sync
 
-每行的开头输出行号和内容
+以冒号: 作为分隔符，获取文件/etc/passwd中信息，每行的开头输出行号和原内容
 # awk -F: '{print NR, $0}' /etc/passwd
 1 root:x:0:0:root:/root:/bin/bash
 2 bin:x:1:1:bin:/bin:/sbin/nologin
@@ -115,7 +114,7 @@ sync:x:5:0:sync:/sbin:/bin/sync
 5 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
 6 sync:x:5:0:sync:/sbin:/bin/sync
 
-将每行第NF个字段的值打印出来
+以冒号: 作为分隔符，获取文件/etc/passwd中信息，将每行内容和第NF个字段的值打印出来
 # awk -F: '{print $0,NF}' /etc/passwd
 root:x:0:0:root:/root:/bin/bash 7
 bin:x:1:1:bin:/bin:/sbin/nologin 7
@@ -126,7 +125,7 @@ sync:x:5:0:sync:/sbin:/bin/sync 7
 shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown 7
 halt:x:7:0:halt:/sbin:/sbin/halt 7
 
-$1与$3相连输出，不分隔
+以冒号: 作为分隔符，获取文件/etc/passwd中信息，输出$1与$3相连，不分隔
 awk -F":" '{print $1 $3}'  /etc/passwd  
 root0
 bin1
@@ -209,39 +208,39 @@ root:x:0:0:root:/root:/bin/bashbin:x:1:1:bin:/bin:/sbin/nologindaemon:x:2:2:daem
 
 方法一：在双引号的情况下使用
 ```shell
-[root@linux ~]# var="bash"
-[root@linux ~]# echo "unix script" |awk "gsub(/unix/,\"$var\")"
+# var="bash"
+# echo "unix script" |awk "gsub(/unix/,\"$var\")"
 bash script
 ```
 方法二：在单引号的情况下使用
 
 ```shell
-[root@linux ~]# var="bash"
-[root@linux ~]# echo "unix script" |awk 'gsub(/unix/,"'"$var"'")'
+# var="bash"
+# echo "unix script" |awk 'gsub(/unix/,"'"$var"'")'
 bash script
 
 
-[root@linux ~]# df -h
+# df -h
 Filesystem           Size  Used Avail Use% Mounted on
 /dev/mapper/cl-root  2.8T  246G  2.5T   9% /
 tmpfs                 24G   20K   24G        1% /dev/shm
 /dev/sda2           1014M  194M  821M   20% /boot
 
-[root@linux ~]# df -h |awk '{ if(int($5)>5){print $6":"$5} }'
+# df -h |awk '{ if(int($5)>5){print $6":"$5} }'
 /:9%
 /boot:20%
 
-[root@linux ~]# i=10
-[root@linux ~]# df -h |awk '{ if(int($5)>'''$i'''){print $6":"$5} }'
+# i=10
+# df -h |awk '{ if(int($5)>'''$i'''){print $6":"$5} }'
 /boot:20%
 ```
 
 方法：awk 参数-v(建议)
 ```shell
-[root@linux ~]# echo "unix script" |awk -v var="bash" 'gsub(/unix/,var)'
+# echo "unix script" |awk -v var="bash" 'gsub(/unix/,var)'
 bash script
 
-[root@linux ~]# awk -v user=root  -F: '$1 == user' /etc/passwd
+# awk -v user=root  -F: '$1 == user' /etc/passwd
 root:x:0:0:root:/root:/bin/bash
 ```
 
@@ -306,7 +305,6 @@ awk -F: '{printf "username: %s,UID:%d\n",$1,$3}' /etc/passwd
 awk -F: '{printf "username: %-20s shell: %s\n",$1,$NF}' /etc/passwd
 free -m | awk 'BEGIN{printf "%.1f\n",'$((10000-28))'/10/12}'
 ```
-
 
 #### 正则表达式
 

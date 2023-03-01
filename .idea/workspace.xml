@@ -75,7 +75,8 @@
       <path value="$PROJECT_DIR$/linux-command-manual" />
     </ignored-roots>
     <MESSAGE value="simple command" />
-    <option name="LAST_COMMIT_MESSAGE" value="simple command" />
+    <MESSAGE value="awk command" />
+    <option name="LAST_COMMIT_MESSAGE" value="awk command" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>
