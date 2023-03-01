@@ -244,57 +244,27 @@ root:x:0:0:root:/root:/bin/bash
 ```
 
 ### 格式化输出
-①、print函数
+
+#### printf格式符
+
+| format | 说明               |
+| ------ | ------------------ |
+| %c     | ascii字符          |
+| %d     | 整数               |
+| %e     | 浮点数，科学计数法 |
+| %f     | 浮点数(如1.234)    |
+| %o     | 八进制数           |
+| %x     | 十六进制数         |
+| %s     | 字符串             |
+
+
+print函数示例：
 ```shell
 # date |awk '{print "Month: " $2 "\nYear: " $NF}' #变量放在双引号外面
 # awk -F: '{print "username is: " $1 "\t uid is: " $3}' /etc/passwd
 # awk -F: '{print "\tusername and uid: " $1,$3}' /etc/passwd
-```
-\t 同意对齐格式：
-
-②、printf函数
-```shell
 # awk -F: '{printf "%-15s %-10s %-15s\n", $1,$2,$3}'  /etc/passwd
 # awk -F: '{printf "|%-15s| %-10s| %-15s|\n", $1,$2,$3}' /etc/passwd
-```
-\n 换行
-
-%s 字符类型
-%d 数值类型
-%f 浮点类型
-占15字符
-- 表示左对齐，默认是右对齐
-  printf默认不会在行尾自动换行，加\n
-
-### 补充点
-
-#### printf命令
-
-其格式化输出：printf FORMAT,item1,item2....
-要点： 
-1. 其与print命令最大不同是，printf需要指定format
-2. printf后面的字串定义内容需要使用双引号引起来
-3. 字串定义后的内容需要使用","分隔，后面直接跟Item1,item2....
-4. format用于指定后面的每个item的输出格式
-5. printf语句不会自动打印换行符，\n
-
-#### 格式符
-```shell
-%c: 显示字符的ASCII码
-%d,%i : 显示十进制整数
-%e,%E: 科学计数法数值显示
-%f : 显示为浮点数
-%g,%G: 以科学数法或浮点形式显示数值
-%s: 显示字符串
-%u: 无符号整数
-%%: 显示%号自身，相当于转义
-```
-
-#### 修饰符
-```shell
-N : 显示宽度
-- : 左对齐（默认为右对齐）
-+ : 显示数值符号
 ```
 
 示例：
