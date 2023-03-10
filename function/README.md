@@ -69,3 +69,41 @@ input second number: 3
 The sum of two numbers equals: 5
 ```
 注意：所有函数在使用前必须定义。这意味着必须将函数放在脚本开始部分，直至shell解释器首次发现它时，才可以使用。调用函数仅使用其函数名即可。
+
+## 函数之间调用
+有时候，我们需要一个函数去调用另外一个函数返回处理结果，来继续执行后面的逻辑，举例如下：
+
+```shell
+#!/bin/bash
+# 
+  
+function check_ip() {
+    IP=$1
+    VALID_CHECK=$(echo $IP|awk -F. '$1<=255&&$2<=255&&$3<=255&&$4<=255{print "yes"}')
+    if echo $IP|grep -E "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$">/dev/null; then
+        if [ ${VALID_CHECK:-no} == "yes" ]; then
+            echo "IP $IP available."
+        else
+            echo "IP $IP not available!"
+        fi
+    else
+        echo "IP format error!"
+    fi
+}
+
+
+function check_network() {
+    IpAddr="192.168.10.1"
+    check_ip ${IpAddr}
+    if [ $? -eq 0 ];then
+        ping -c 2  -i 0.5 ${IpAddr} > /dev/null 2>&1
+        if [ $? -eq 0 ];then
+            echo "ip address is reachable."
+        else
+            echo "ip address is unreachable"
+        fi
+    fi
+}
+
+check_network
+```

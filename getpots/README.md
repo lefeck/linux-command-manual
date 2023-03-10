@@ -1,0 +1,239 @@
+# getpots
+
+getpots是shell命令行参数解析工具，旨在从Shell Script的命令行当中解析参数。getopts被Shell程序用来分析位置参数，option包含需要被识别的选项字符，如果这里的字符后面跟着一个冒号，表明该字符选项需要一个参数，
+其参数需要以空格分隔。冒号和问号不能被用作选项字符。getopts每次被调用时，它会将下一个选项字符放置到变量中，OPTARG则可以拿到参数值；如果option前面加冒号，则代表忽略错误；
+
+```text
+$ getopt --help
+用法：
+ getopt optstring parameters
+ getopt [options] [--] optstring parameters
+ getopt [options] -o|--options optstring [options] [--] parameters
+
+选项：
+ -a, --alternative            允许长选项以 - 开始
+ -h, --help                   这个简短的用法指南
+ -l, --longoptions <长选项>  要识别的长选项
+ -n, --name <程序名>         将错误报告给的程序名
+ -o, --options <选项字符串>  要识别的短选项
+ -q, --quiet                  禁止 getopt(3) 的错误报告
+ -Q, --quiet-output           无正常输出
+ -s, --shell <shell>          设置 shell 引用规则
+ -T, --test                   测试 getopt(1) 版本
+ -u, --unquoted               不引用输出
+ -V, --version                输出版本信息
+```
+
+getopts工具用于解析shell脚本中的参数
+
+* getopts时bash的内部命令 
+* getopts有两个参数，第一个参数是一个字符串，包括字符和“:”
+* 每一个字符都是一个有效选项（option），如果字符后面带有“:”，表示这个选项有自己的argument，argument保存在内置变量OPTARG中
+* $OPTARG总是存储原始$*中下一个要处理的元素位置
+
+## 示例一
+```shell
+#!/bin/bash
+ 
+function usage() {
+      cat << EOF
+Usage: $(basename "${BASH_SOURCE[0]}") [-s source_dir] [-d destination] [-u] [-h]"
+
+options:
+
+-s the path of source directory"
+-d the path of destination directory"
+-u upload file to the specify path
+-h Print this help and exit
+EOF
+    exit
+}
+
+# default value
+upload="false"
+ 
+while getopts 's:d:uh' OPT; do
+    case $OPT in
+        s) 
+            soure_dir="$OPTARG"
+            ;;
+        d) 
+            destination_dir="$OPTARG"
+            ;;
+        u) 
+            upload="true"
+            ;;
+        h) 
+            usage
+            ;;
+        ?*) 
+            usage
+            ;;
+    esac
+done
+ 
+echo "source dir: " $soure_dir
+echo "destination dir: "$destination_dir
+echo "upload status: "$upload
+```
+output:
+```shell
+[root@heketi ]# bash short_options.sh  -h
+Usage: short_options.sh [-s source_dir] [-d destination] [-u] [-h]"
+
+options:
+
+-s the path of source directory"
+-d the path of destination directory"
+-u upload file to the specify path
+-h Print this help and exit
+
+[root@heketi ]# bash short_options.sh  -s /etc/init.d/  -d /usr/local/bin         
+source dir:  /etc/init.d/
+destination dir: /usr/local/bin
+upload status: false
+
+[root@heketi ]# bash short_options.sh  -s /etc/init.d/  -d /usr/local/bin -u
+source dir:  /etc/init.d/
+destination dir: /usr/local/bin
+upload status: true
+
+# 我们会发现这种长选项并不支持
+[root@heketi ]# bash short_options.sh  --help
+short_options.sh: illegal option -- -         # 报错不支持
+Usage: short_options.sh [-s source_dir] [-d destination] [-u] [-h]"
+
+options:
+
+-s the path of source directory"
+-d the path of destination directory"
+-u upload file to the specify path
+-h Print this help and exit
+```
+getopts后面跟的字符串就是参数列表，每个字母代表一个选项，如果字母后面跟一个:，则就表示这个选项还会有一个值，比如上面例子中对应的-s /etc/init.d/  和-d /usr/local/bin 。而getopts字符串中没有跟随:的字母就是开关型选项，
+不需要指定值，等同于true/false,只要带上这个参数就是true, 比如上面例子中对应的-u选项，不指定-u是false，指定-u就是true。
+
+getopts识别出各个选项之后，就可以配合case进行操作。操作中，有两个"常量"，一个是OPTARG，用来获取当前选项的值；另外一个就是OPTIND，表示当前选项在参数列表中的位移。
+
+有时候，我们可能需要脚本即支持段选项，又支持长参数选项实现这个脚本，让用户看起来很直观，该参数的想表达的含义。因此，我们需要以下方式来实现。
+
+
+# getopt
+
+* getopt是一个外部命令，通常Linux发行版会自带 
+* getopt支持短选项和长选项
+* 增强版getopt比较好用，执行命令getopt -T; echo $?,如果输出4，则代表是增强版
+* 如果短选项带argument且参数可选时，argument必须紧贴选项，例如-carg而不能是-c arg
+* 如果长选项带argument且参数可选时，argument和选项之间用“=”，例如–clong=arg而不能是–clong arg
+
+7
+## 示例二
+
+```shell
+#!/bin/bash
+
+set -Eeuo pipefail
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+function usage() {
+  cat << EOF
+Usage: $(basename "${BASH_SOURCE[0]}") [-a [rsa|ecc]] [-d <domain>] [-n <name>] [-h]"
+
+💁 This script will be automatic certificate genetatory.
+
+
+Available options:
+
+-a --algorithm         Algorithms supported by the issuing certificate tool. for example: rsa, ecc, default the algorithm is "rsa".
+-d --domain            The name of the domain name required to issue the certificate. for example: xxx.com, abc.org, *.abc.org, default the domain name is "domain.com".
+-n --name              Name of the file generated by the issuance certificate, default the name is "server".
+-h --help              Print this help and exit
+-v --verbose           Print script debug info
+EOF
+  exit
+}
+
+function parse_param() {
+    domain_name=${domain_name:-domain.com}
+    algorithm=${algorithm:-rsa}
+    srv_key_name=${srv_key_name:-server}
+    
+    # -o或--options选项后面是可接受的短选项，如ab:c::，表示可接受的短选项为-a -b -c，
+    # 其中-a选项不接参数，-b选项后必须接参数，-c选项的参数为可选的
+    # -l或--long选项后面是可接受的长选项，用逗号分开，冒号的意义同短选项。
+    # -n选项后接选项解析错误时提示的脚本名字
+
+    # parse argument of the command
+    getopt_cmd=$(getopt -o a:d:n:hv --long algorithm:,domain:,name:,help,verbose -n $(basename $0) -- "$@")
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+    eval set -- "$getopt_cmd"
+    while [ -n "$1" ]; do
+        case "$1" in
+                -a|--algorithm)
+                    algorithm="$2"
+                    shift ;;
+                -d|--domain)
+                    domain_name="$2"
+                    shift ;;
+                -n|--name)
+                    srv_key_name="$2"
+                    shift ;;
+                -h|--help)
+                    usage
+                    ;;
+                -v|--verbose)
+                    set -x
+                    ;;
+                --) shift
+                    break ;;
+                ?*) echo "$1 is not an option"
+                    exit 1 ;; 
+        esac
+        shift
+    done
+}
+
+parse_param $@
+
+echo "algorithm: ${algorithm}"
+echo "domain_name: ${domain_name}"
+echo "srv_key_name:${srv_key_name}"
+```
+output
+```shell
+# 可以看到不管段选项，还是长选项都完美支持。
+[root@heketi ]# bash long_options.sh  -h
+Usage: long_options.sh  [-a [rsa|ecc]] [-d <domain>] [-n <name>] [-h]"
+
+💁 This script will be automatic certificate genetatory.
+
+
+Available options:
+
+-a --algorithm         Algorithms supported by the issuing certificate tool. for example: rsa, ecc, default the algorithm is "rsa".
+-d --domain            The name of the domain name required to issue the certificate. for example: xxx.com, abc.org, *.abc.org, default the domain name is "domain.com".
+-n --name              Name of the file generated by the issuance certificate, default the name is "server".
+-h --help              Print this help and exit
+-v --verbose           Print script debug info
+[root@heketi ]# bash long_options.sh --help
+Usage: long_options.sh  [-a [rsa|ecc]] [-d <domain>] [-n <name>] [-h]"
+
+💁 This script will be automatic certificate genetatory.
+
+
+Available options:
+
+-a --algorithm         Algorithms supported by the issuing certificate tool. for example: rsa, ecc, default the algorithm is "rsa".
+-d --domain            The name of the domain name required to issue the certificate. for example: xxx.com, abc.org, *.abc.org, default the domain name is "domain.com".
+-n --name              Name of the file generated by the issuance certificate, default the name is "server".
+-h --help              Print this help and exit
+-v --verbose           Print script debug info
+
+[root@heketi ]# bash long_options.sh  -a acc
+algorithm: acc
+domain_name: domain.com
+srv_key_name:server
+```
