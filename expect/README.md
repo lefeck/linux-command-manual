@@ -2,7 +2,7 @@
 
 expect是建立在tcl（参见：Tcl/Tk快速入门）基础上的一个工具，它可以让一些需要交互的任务自动化地完成。相当于模拟了用户和命令行的交互操作。 
 
-1. yum 安装
+## 安装expect工具包
 ```shell
 yum install -y expect
 ```
@@ -12,54 +12,101 @@ expect 依赖于 tcl, 所以需要首先安装 tcl。可以使用rpm检查是否
 rpm -qa | grep tcl
 ```
 
-2. expect中命令
-```
-spawn：监控程序，用于监控提出的交互性问题
-send：发送字符串至交互问题
-interact：回答完交互问题留在交互界面
-exp_continue：匹配问题不存在时继续执行动作
-expect eof：回答完交互问题退出expect
-set NAME [ lindex $argv 0 ]：定义变量，0表示在expect脚本后第一个字符串，NAME表示变量名
-```
+## expect用法
 
-3. expect - send
+这里我们用一个示例来说明，各个命令的含义：
+```sh
+#!/usr/bin/expect
+set timeout 30
+spawn ssh -l username 192.168.1.1
+expect "password:"
+send "ispass\r"
 
-expect 接收命令执行后的输出，然后和期望字符串匹配，若对应就执行相应的send来发送交互信息。
+# expect "password:" {send "${ispass}\r"} # 等同上面2行
+interact
+```
+### 解析：
+
+1. ［#!/usr/bin/expect］
+
+这一行告诉操作系统脚本里的代码使用那一个shell来执行。这里的expect其实和linux下的bash、windows下的cmd是一类东西。
+
+注意：这一行需要在脚本的第一行。
+
+2. ［set timeout 30］
+
+“set  自定义变量名”：设置超时时间的，现在你只要记住他的计时单位是：秒   。timeout -1 为永不超时
+
+3. ［spawn ssh -l username 192.168.1.1］
+
+spawn是进入expect环境后才可以执行的expect内部命令，如果没有装expect，需要安装expect工具包。
+
+它主要的功能是给ssh运行进程，用来传递交互指令。可以理解为启动一个新进程
+
+4. ［expect "password:"］
+
+从进程接收字符串，这里的expect是expect的一个内部命令，expect的shell命令和内部命令是一样的，但不是一个功能。这个命令的意思是判断上次输出结果里是否包含“password:”的字符串，如果有则立即返回，否则就等待一段时间后返回，这里等待时长就是前面设置的30秒；
+
+5. ［send "ispass\r"］
+
+send接收一个字符串参数，并将该参数发送到进程。这里就是执行交互动作，与手工输入密码的动作等效。 命令字符串结尾别忘记加上“\r”，表示“回车键”。
+
+6. ［interact］
+
+允许用户交互；执行完成后保持交互状态，把控制权交给控制台，这个时候就可以手工操作了。如果没有这一句登录完成后会退出，而不是留在远程终端上。
+
+7. $argv 参数数组
+
+expect脚本可以接受从bash传递过来的参数.可以使用[lindex $argv n]获得，n从0开始，分别表示第一个,第二个,第三个....参数
 
 示例：
-```
-expect "$case1" {send "$respond1\r"} # 这一行等同于下面两行
-
-expect "$case1"
-send "$response1\r"
-```
-
-4. 原理与工作机制
-```
-首先使用 spawn 开启一个会话，然后使用 expect-send 对来执行交互式操作。 
-spawn 后面跟上一个命令操作，表示开启一个会话。expect 等待输出特定的字符串(通常是提示符)，然后使用send 发送交互字符串。比如：
-#!/usr/bin/expect   #使用的是哪一个shell解释器
-spawn ssh root@192.168.170.13  # 远程登录
-expect "*password:" # 提示为："username@host's password:", 等待用户输入密码
-send "123456\r"  # 这时使用send模拟用户输入密码的字符串，完成登录验证。
-"interact"   #完交互问题留在交互界面
-```
-
-5. 接收参数
-```
-参数存在argv中，使用第一个参数如下：
-
+```shell
+#!/usr/bin/expect
+#
+# 参数存在argv中，使用第一个参数如下：
 set param0 [lindex $argv 0]
 
-$argc表示参数个数,判断语句如下:
-
+# $argc表示参数个数,判断语句如下:
 if {$argv < 1} {
     #do something
     send_user "usage: $argv0 <param1> <param2> ... "
     exit
 }
-注：$argv0 是脚本名，但[lindex $argv 0]是第一个参数 param1, [lindex $argv 1]是第二个参数 param2, 以此类推 
+```
+注：
+
+$argv0 是脚本名，但[lindex $argv 0]是第一个参数 param1, [lindex $argv 1]是第二个参数 param2, 以此类推
+
 send_user 用来显示信息到父进程(一般为用户的shell)的标准输出。
+
+## 重点
+
+expect最常用的语法是来自tcl语言的模式-动作。这种语法极其灵活，下面我们就各种语法分别说明。
+
+单一分支模式语法：
+```shell
+expect "hi" {send "You said hi"}
+```
+
+匹配到hi后，会输出"you said hi"
+
+多分支模式语法：
+
+这种模式很有用，我们在登录ssh的时候，当你是第一次登录机器和第二次登录机器的时候，交互模式是不一样的。因此，我们可以使用这种模式去解决交互模式单一的问题。
+
+```shell
+expect "hi" { send "You said hi\n" } \
+"hello" { send "Hello yourself\n" } \
+"bye" { send "dat was unexpected\n" }
+```
+匹配到hi,hello,bye任意一个字符串时，执行相应的输出。等同于如下写法：
+```shell
+expect {
+"hi" { send "You said hi\n"}
+"hello" { send "Hello yourself\n"}
+"bye" { send "That was unexpected\n"}
+}
+
 ```
 
 ## 示例

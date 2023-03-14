@@ -4,14 +4,15 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="23be86c3-252d-491f-8a8f-dbc34f141280" name="变更" comment="">
-      <change afterPath="$PROJECT_DIR$/expact/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/getpots/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/getpots/long_options.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/getpots/short_options.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/random/README.md" afterDir="false" />
+    <list default="true" id="23be86c3-252d-491f-8a8f-dbc34f141280" name="变更" comment="add expect, function, getpots and random commnad">
+      <change afterPath="$PROJECT_DIR$/interactive-input/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tr/READMD.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/function/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/function/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bash-command-doc.md" beforeDir="false" afterPath="$PROJECT_DIR$/bash-command-doc.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expect/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/expect/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/getpots/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/getpots/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/if/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/if/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/variables/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/variables/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +82,8 @@
     </ignored-roots>
     <MESSAGE value="simple command" />
     <MESSAGE value="awk command" />
-    <option name="LAST_COMMIT_MESSAGE" value="awk command" />
+    <MESSAGE value="add expect, function, getpots and random commnad" />
+    <option name="LAST_COMMIT_MESSAGE" value="add expect, function, getpots and random commnad" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>

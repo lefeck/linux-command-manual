@@ -1,8 +1,10 @@
 # getpots
 
-getpots是shell命令行参数解析工具，旨在从Shell Script的命令行当中解析参数。getopts被Shell程序用来分析位置参数，option包含需要被识别的选项字符，如果这里的字符后面跟着一个冒号，表明该字符选项需要一个参数，
-其参数需要以空格分隔。冒号和问号不能被用作选项字符。getopts每次被调用时，它会将下一个选项字符放置到变量中，OPTARG则可以拿到参数值；如果option前面加冒号，则代表忽略错误；
-
+getpots是shell命令行用来解析位置参数的命令。
+* getopts时bash的内部命令
+* getopts有两个参数，第一个参数是一个字符串，包括字符和“:”
+* 每一个字符都是一个有效选项（option），如果字符后面带有“:”，表示这个选项有自己的argument，argument保存在内置变量OPTARG中
+* $OPTARG总是存储原始$*中下一个要处理的元素位置
 ```text
 $ getopt --help
 用法：
@@ -23,13 +25,6 @@ $ getopt --help
  -u, --unquoted               不引用输出
  -V, --version                输出版本信息
 ```
-
-getopts工具用于解析shell脚本中的参数
-
-* getopts时bash的内部命令 
-* getopts有两个参数，第一个参数是一个字符串，包括字符和“:”
-* 每一个字符都是一个有效选项（option），如果字符后面带有“:”，表示这个选项有自己的argument，argument保存在内置变量OPTARG中
-* $OPTARG总是存储原始$*中下一个要处理的元素位置
 
 ## 示例一
 ```shell
@@ -110,13 +105,14 @@ options:
 -u upload file to the specify path
 -h Print this help and exit
 ```
-getopts后面跟的字符串就是参数列表，每个字母代表一个选项，如果字母后面跟一个:，则就表示这个选项还会有一个值，比如上面例子中对应的-s /etc/init.d/  和-d /usr/local/bin 。而getopts字符串中没有跟随:的字母就是开关型选项，
-不需要指定值，等同于true/false,只要带上这个参数就是true, 比如上面例子中对应的-u选项，不指定-u是false，指定-u就是true。
+getopts后面跟的字符串就是参数列表，每个字母代表一个选项，如果字母后面跟一个:，则就表示这个选项还会有一个值，比如例子中的`-s /etc/init.d/`  和`-d /usr/local/bin` 。
+
+getopts字符串中没有跟随`:`的字母就是开关型选项，不需要指定值，等同于true/false,只要带上这个参数就是true, 比如上面例子中对应的-u选项，不指定-u是false，指定-u就是true。
 
 getopts识别出各个选项之后，就可以配合case进行操作。操作中，有两个"常量"，一个是OPTARG，用来获取当前选项的值；另外一个就是OPTIND，表示当前选项在参数列表中的位移。
 
-有时候，我们可能需要脚本即支持段选项，又支持长参数选项实现这个脚本，让用户看起来很直观，该参数的想表达的含义。因此，我们需要以下方式来实现。
 
+有时候，我们可能需要脚本即支持段选项，又支持长参数选项实现这个脚本，让用户看起来很直观，该参数的想表达的含义。因此，需要getopt来实现。
 
 # getopt
 
@@ -126,7 +122,7 @@ getopts识别出各个选项之后，就可以配合case进行操作。操作中
 * 如果短选项带argument且参数可选时，argument必须紧贴选项，例如-carg而不能是-c arg
 * 如果长选项带argument且参数可选时，argument和选项之间用“=”，例如–clong=arg而不能是–clong arg
 
-7
+
 ## 示例二
 
 ```shell
@@ -202,7 +198,7 @@ echo "algorithm: ${algorithm}"
 echo "domain_name: ${domain_name}"
 echo "srv_key_name:${srv_key_name}"
 ```
-output
+output:
 ```shell
 # 可以看到不管段选项，还是长选项都完美支持。
 [root@heketi ]# bash long_options.sh  -h
