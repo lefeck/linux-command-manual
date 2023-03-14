@@ -200,7 +200,7 @@ echo "srv_key_name:${srv_key_name}"
 ```
 output:
 ```shell
-# 可以看到不管段选项，还是长选项都完美支持。
+# 可以看到不管短选项还是长选项都完美支持。
 [root@heketi ]# bash long_options.sh  -h
 Usage: long_options.sh  [-a [rsa|ecc]] [-d <domain>] [-n <name>] [-h]"
 
