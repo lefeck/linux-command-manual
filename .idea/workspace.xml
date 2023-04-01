@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23be86c3-252d-491f-8a8f-dbc34f141280" name="变更" comment="">
+      <change afterPath="$PROJECT_DIR$/eval/REDME.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shift/REDME.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/getpots/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/getpots/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interactive-input/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/interactive-input/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/array/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/array/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expect/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/expect/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +49,8 @@
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
     &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/Johnny/go/src/linux-command-manual&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;
   }

@@ -235,3 +235,94 @@ for name in "${names[@]}"; do
 done
 echo ${string_name} #结果： jack|tom|luce
 ```
+
+# shell中如果一个字符串在数组中,排序后把它放在最后一个执行
+
+您可以使用bash shell的数组功能和排序功能来实现将数组中特定字符串放在最后执行的功能。
+
+以下是一种可能的实现方法：
+
+```shell
+#!/bin/bash
+
+# 定义数组
+arr=("apple" "banana" "orange" "grape" "pear" "orange")
+
+# 将要放在最后执行的字符串
+target="orange"
+
+# 对数组进行排序
+sorted=($(echo "${arr[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+
+# 从数组中删除目标字符串
+arr=(${arr[@]/$target})
+
+# 将目标字符串添加到数组末尾
+arr+=($target)
+
+# 执行排序后的数组
+for item in "${sorted[@]}"
+do
+  if [[ $item == $target ]]
+  then
+    continue
+  fi
+  echo $item
+done
+
+# 最后执行目标字符串
+echo $target
+```
+在此示例中，我们首先定义了一个包含重复项的数组，然后指定了要放在最后执行的目标字符串。我们使用sort -u对数组进行排序并去除重复项。接下来，我们从数组中删除目标字符串并将其添加到数组末尾。最后，我们循环遍历已排序的数组并执行每个元素，但跳过目标字符串。在循环结束后，我们最后执行目标字符串。
+
+请注意，这种实现方法假定目标字符串只出现一次。如果目标字符串出现多次，它将只出现在数组的最后一次出现的位置。
+
+
+# 一个字符串在数组中,排序后把它放在第一个执行
+
+假设你有一个包含字符串的数组 arr，并且你想要检查一个特定的字符串 target 是否在这个数组中。如果 target 在数组中，你想要对数组进行排序，并将 target 放在数组的第一个位置。
+
+以下是一个示例：
+```shell
+#!/bin/bash
+
+# 定义数组
+arr=("apple" "banana" "orange" "pear" "kiwi")
+
+# 定义要查找的字符串
+target="orange"
+
+# 检查 target 是否在数组中
+if [[ " ${arr[*]} " == *" $target "* ]]; then
+    # 如果在数组中，排序并将 target 放在第一个位置
+    sorted_arr=($(echo "${arr[@]}" | tr ' ' '\n' | grep -v $target | sort) $target)
+    echo "Sorted array with $target at the beginning: ${sorted_arr[@]}"
+else
+    echo "$target not found in array"
+fi
+```
+在这个脚本中，我们首先定义了一个名为 arr 的数组和一个名为 target 的要查找的字符串。接下来，我们使用一个 if 语句来检查 target 是否在数组中。如果在数组中，我们使用 grep 和 sort 命令对数组进行排序，并将 target 放在第一个位置。最后，我们使用 echo 命令打印排序后的数组。
+
+请注意，这个解决方案假设数组中的所有字符串都不包含空格。如果数组中的字符串可能包含空格，那么需要对脚本进行一些修改来处理这种情况。
+
+
+在shell中，可以使用循环遍历两个数组，对于每个元素，检查它是否在另一个数组中存在。如果存在，则从两个数组中删除该元素，否则跳过。
+
+下面是一个示例脚本，假设数组a和数组b已经定义：
+
+```shell
+#!/bin/bash
+
+# 遍历数组a
+for i in "${!a[@]}"; do
+    # 检查元素是否存在于数组b中
+    if [[ " ${b[@]} " =~ " ${a[$i]} " ]]; then
+        # 如果存在，则从两个数组中删除元素
+        unset 'a[$i]'
+        unset 'b[${b[@]/${a[$i]}}]'
+    fi
+done
+```
+在这个脚本中，我们使用${!a[@]}遍历数组a的索引，${b[@]/${a[$i]}}删除数组b中与当前元素匹配的项，并使用unset删除数组中的元素。
+
+注意，这种方法对于大型数组可能会比较慢，因为它需要进行多次循环和操作。如果需要更高效的方法，可以考虑使用一些高级的数据结构，例如哈希表。
