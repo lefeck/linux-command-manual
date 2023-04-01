@@ -36,9 +36,9 @@ echo "user: $name"
 echo "email: $email"
 echo "job: $job"
 ```
-
 output:
-其中，eval 很好的解决了在 sed 中对变量进行赋值的问题，我们可以通过bash -x 参数debug这个参数解析的流程，执行效果如下：
+
+其中，eval 很好的解决了在 sed 中对变量进行赋值的问题，我们可以通过bash -x参数debug这个参数解析的流程，执行效果如下：
 ```shell
 [root@localhost ~]# bash -x eval.sh zhoumin
 + '[' -z zhoumin ']'
@@ -73,7 +73,9 @@ email: -
 + echo 'job: -'
 job: -
 ```
+output：
 
+非debug模式输出信息
 ```shell
 [root@localhost ~]# ./info_employee.sh zhoumin
 user: zhoumin
