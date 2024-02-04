@@ -101,6 +101,7 @@ x\{m,n\} # 重复字符x，至少m次，不多于n次，如：/0\{5,10\}/匹配5
 
 ```shell
 sed -i  '/^SELINUX/s/=.*/=disabled/g' /etc/selinux/config   ##修改，不显示
+sed -i '/imagePullPolicy/s/: .*/: Always/g' nginx-deploy.yaml # 镜像策略改成Always模式
 sed 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-eth1 ##只是显示，不修改
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-eth1 ##只修改，不显示
 sed -i 's/dhcp/static/g' ip ##将所有的dhcp替换为static
@@ -126,7 +127,8 @@ sed -i -e :a -e '$!N;s/.*n(.*directory)/1/;ta' -e 'P;D' server.xml
 # 删除指定文件的下一行
 sed -i '/pattern="%/{n;d}' server.xml
 
-
+#文件中查找指定字符串并删除所在行
+sed -ie '/GRUB_TIMEOUT_STYLE=hidden/d' /etc/default/grub
 
 # 完整实例:
 #文件转化成列表
@@ -305,12 +307,11 @@ grep -E '2023-01-07 00:[0-5][0-9]:[0-5][0-9]|2023-01-07 03:[0-5][0-9]:[0-5][0-9]
 
 # 去除行首空格
 
-1. **行首空格 **
+1. **行首空格**
 
 ```sh
 sed 's/^[ \t]*//g' 
 ```
-
 说明：
 
 * 第一个/的左边是s表示替换，即将空格替换为空
@@ -320,7 +321,7 @@ sed 's/^[ \t]*//g'
 
 含义：用空字符去替换一个或多个用空格或tab开头的字符串
 
-2. **行末空格 **
+2. **行末空格**
 
 ```sh
 sed 's/[ \t]*$//g' 
@@ -328,10 +329,55 @@ sed 's/[ \t]*$//g'
 
 表示以xx结尾的字符串为对象,删除后面的空格
 
-
-
 3. **删除所有的空格**
 
 ```sh
 sed s/[[:space:]]//g
 ```
+
+## 在匹配行前面添加或取消注释
+
+测试文件
+```sh
+cat << eof >> iptables.txt
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 80 -j DROP
+-A INPUT -p tcp -m tcp --dport 443 -j DROP
+eof
+```
+
+**在文件的匹配行前面加上#注释**
+
+需求：给DROP前面全部加上注释
+
+```sh
+sed -i "s/^[^#].*DROP$/#&/g" iptables.txt
+#： s:替换
+#:  ^:开头匹配
+#： [^#]:匹配非#
+#： #&:中的&代表匹配整行，整个意思就是行前面加上#号
+#： g:全部（只匹配特定行不加）
+```
+结果如下：
+```txt
+cat iptables.txt
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+#-A INPUT -p tcp -m tcp --dport 80 -j DROP
+#-A INPUT -p tcp -m tcp --dport 443 -j DROP
+```
+
+**在文件的匹配行前面取消#注释**
+
+需求：取消DROP前面的注释
+```sh
+sed -i "/^#.*DROP$/s/^#//" iptables.txt
+#：^#//:去掉代表开头的#
+```
+效果如下：
+```sh
+cat iptables.txt
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 80 -j DROP
+-A INPUT -p tcp -m tcp --dport 443 -j DROP
+```
+

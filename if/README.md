@@ -34,8 +34,12 @@
 1
 [root@localhost ~]# [ ! -d /shell/dir1 ];echo $?      #判断目录是否存在,不存在条件为真
 0
-[root@localhost ~]# [[ -f /shell/1.sh ]];echo $?      #判断文件是否存在，并且是一个普通的文件
-1
+[root@localhost ~]# [[ -f /etc/resolv.conf ]];echo "$FILE exist"      #判断文件是否存在，并且是一个普通的文件
+/etc/resolv.conf exist
+[root@localhost ~]# test -f /etc/resolv.conf && echo "$FILE exist" # 含义同上
+/etc/resolv.conf exist
+[root@localhost ~]# [ -f /etc/resolv.conf ] && echo "$FILE exist" # 含义同上
+/etc/resolv.conf exist
 ```
 
 ### 判断文件权限
@@ -155,11 +159,41 @@ this is root
 | -a 和 &&  | 逻辑与 | [ 1 -eq 1 -a 1 -ne 0 ] [ 1 -eq 1 ] && [ 1 -ne 0 ] (注意：[]判断语句结构中-a符号是在一个判断语句中使用；&&是在两个判断语句中使用；) [[ 1 -eq 1 && 1 -ne 0 ]] (注意：**[[ ]] 判断语法不支持 -a 和 -o**) |
 | -o 和\|\| | 逻辑或 | [ 1 -eq 1 -o 1 -ne 0 ] [ 1 -eq 1 ] \|\| [ 1 -ne 0 ] (注意：[]判断语句结构中-a符号是在一个判断语句中使用；&&是在两个判断语句中使用) [[ 1 -eq 1 \|\| 1 -ne 0 ]] (注意：**[[ ]] 判断语法不支持 -a 和 -o**) |
 
+
+示例如下：
+
+如果要在&&运算符之后运行一系列命令，只需将命令括在用；或&&分隔的大括号中：
+```shell
+[ -f /etc/resolv.conf ] && { echo "$FILE exist"; cp "$FILE" /tmp/; }
+```
+与&&相反，只有在test命令的exit状态为false时，才会执行||运算符后面的语句。
+```shell
+[ -f /etc/resolv.conf ] && echo "$FILE exist" || echo "$FILE does not exist"
+```
 #### 特别说明
 
 * && 前面的表达式为真，才会执行后面的代码
 * || 前面的表达式为假，才会执行后面的代码
 * ; 只用于分割命令或表达式
+
+条件判断示例:
+
+使用双竖线（||）运算符，你可以指定一个备选命令，如果前一个命令的退出状态是非0，则会执行备选命令。如果前一个命令的退出状态是0，则会跳过备选命令，直接执行下一个命令。
+
+例如：
+
+我们使用ls命令和ifconfig命令做测试，ifconfig命令安装包目前没有安装
+```shell
+[root@node1 ~]# ls || ifconfig
+anaconda-ks.cfg
+```
+这个命令会先执行ls，由于ls的退出状态是0，因此，不会执行ifconfig命令。
+```shell
+[root@node1 ~]# ifconfig || ls
+-bash: ifconfig: command not found
+anaconda-ks.cfg
+```
+这个命令会先执行ifconfig，由于ifconfig的退出状态是非0，则会执行ls命令。
 
 
 ## 总结

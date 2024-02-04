@@ -326,3 +326,26 @@ done
 在这个脚本中，我们使用${!a[@]}遍历数组a的索引，${b[@]/${a[$i]}}删除数组b中与当前元素匹配的项，并使用unset删除数组中的元素。
 
 注意，这种方法对于大型数组可能会比较慢，因为它需要进行多次循环和操作。如果需要更高效的方法，可以考虑使用一些高级的数据结构，例如哈希表。
+
+# 按顺序卸载rpm包
+在卸载rpm的时候,考虑到安装包之间存在依赖关系,所以,我们需要按顺序卸载rpm包，示例：
+```shell
+#!/bin/bash
+
+clickhouse_pkg_names=$(rpm -qa | grep clickhouse)
+clickhouse_array_names=("${clickhouse_pkg_names}")
+target=$(rpm -qa | grep clickhouse-common-static)
+sorted=("$(echo "${clickhouse_array_names[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')")
+clickhouse_array_names=("${clickhouse_array_names[@]/$target}")
+clickhouse_array_names+=("${target}")
+for name in "${clickhouse_array_names[@]}"; do
+        split_name=$(echo ${name%-*})
+        split_name=$(echo ${split_name%-*})
+        if [ $? -eq 0 ]; then
+            rpm -e ${split_name}
+            echo "${split_name} is uninstalling"
+        else
+            echo "${split_name} is already uninstalled"
+        fi
+done
+```

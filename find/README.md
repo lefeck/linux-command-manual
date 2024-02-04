@@ -322,15 +322,73 @@ find . -type f -user tom
 find . -type f -group sunk
 ```
 
-#### 借助`-exec`选项与其他命令结合使用
+#### 组合 find 和 exec 命令的实例
+
+**将 exec 命令与 find 命令的输出一起使用**
+
+用exec执行find的基本语法如下：
+
+```shell
+find [path] [arguments] -exec [command] {} \;
+```
+解释：
+  * [command]是对 find 命令给出的结果执行的内容。
+  * {} 是一个占位符，用于保存 find 命令给出的结果。
+  * \\; 表示对于每个找到的结果，都会执行[command]。
+
+Tip: `{}` 和 \ 之间必须有一个空格；
+
+还有另一种语法与上述略有不同，如下所示：
+```shell
+find [path] [arguments] -exec [command] {} +
+```
+这里，`+`表示对于 find 命令的每个结果，[command] 只执行一次。所有结果都作为参数一起传递给 [command]。
+
+**`{} \;` 与 `{} +`区别**
+
+获取当前目录下的所有txt文件, 通过下面2种方式:
+```shell
+find . -type f -name *.txt -exec ls {} \;
+find . -type f -name *.txt -exec ls {} +
+```
+`{} \;` 是这样（为每个找到的结果执行命令）：
+```shell
+ls file1.txt
+ls file2.txt
+ls file3.txt
+```
+`{} +` 就像这样（使用所有结果参数执行命令一次）：
+```shell
+ls file1.txt file2.txt file3.txt
+```
+
+虽然看起来使用`{} +`是更好的选择，但事实恰恰相反。如果查找命令抛出 50 个结果，则不能将它们全部作为参数一起传递，因为对最大命令行长度有限制。
+
+
 
 找出当前目录下所有root的文件，并把所有权更改为用户tom
 
 ```shell
-find .-type f -user root -exec chown tom {} \;
+find . -type f -user root -exec chown tom {} \;
+```
+上例中， **{}** 用于与 **-exec** 选项结合使用来匹配所有文件，然后会被替换为相应的文件名。
+
+
+找出 /tmp 目录下的所有锁定文件并显示它们的属性。
+```shell
+sudo find /tmp/ -type f -name *lock -exec ls -l {} \;
 ```
 
-上例中， **{}** 用于与 **-exec** 选项结合使用来匹配所有文件，然后会被替换为相应的文件名。
+找出 /tmp 目录下收集每个文件的大小，并将输出保存在 /root 目录下，文件名为 du_data.out。
+
+```shell
+find /tmp/ -type f -exec du -sh {} \; > /root/du_data.out
+```
+找出 /home/sagar 目录下, 类型是文件，修改文件的权限为644。
+
+```shell
+find /home/sagar -type f -exec chmod 644 {} \;
+```
 
 找出自己家目录下所有的.txt文件并删除
 

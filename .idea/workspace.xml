@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="23be86c3-252d-491f-8a8f-dbc34f141280" name="变更" comment="">
-      <change beforePath="$PROJECT_DIR$/eval/REDME.md" beforeDir="false" afterPath="$PROJECT_DIR$/eval/REDME.md" afterDir="false" />
-    </list>
+    <list default="true" id="23be86c3-252d-491f-8a8f-dbc34f141280" name="变更" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -80,7 +78,8 @@
     <MESSAGE value="add expect, function, getpots and random commnad" />
     <MESSAGE value="update expect command" />
     <MESSAGE value="add eval and shift command" />
-    <option name="LAST_COMMIT_MESSAGE" value="add eval and shift command" />
+    <MESSAGE value="add xargs command and etc" />
+    <option name="LAST_COMMIT_MESSAGE" value="add xargs command and etc" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>
