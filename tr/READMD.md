@@ -126,18 +126,23 @@ eof
 \r Ctrl-M 回车
 \t Ctrl-I tab键
 \v Ctrl-X 水平制表符
-CHAR1-CHAR2 从CHAR1 到 CHAR2的所有字符按照ASCII字符的顺序
-[CHAR*] in SET2, copies of CHAR until length of SET1
-[CHAR*REPEAT] REPEAT copies of CHAR, REPEAT octal if starting with 0
-[:alnum:] 所有的字母和数字
-[:alpha:] 所有字母
-[:blank:] 水平制表符，空白等
-[:cntrl:] 所有控制字符
-[:digit:] 所有的数字
-[:graph:] 所有可打印字符，不包括空格
-[:lower:] 所有的小写字符
-[:print:] 所有可打印字符，包括空格
-[:punct:] 所有的标点字符
-[:space:] 所有的横向或纵向的空白
-[:upper:] 所有大写字母
 ```
+
+
+常匹配字符串：
+
+| 字符串       | 含义                 | 备注                                                         |
+| --------- | -------------------- | ------------------------------------------------------------ |
+| [:lower:] | 匹配所有小写字母     | 所有大小写和数字[a-zA-Z0-9]                                  |
+| [:upper:] | 匹配所有大写字母     |                                                              |
+| [:digit:] | 匹配所有数字         |                                                              |
+| [:alnum:] | 匹配所有字母和数字   |                                                              |
+| [:alpha:] | 匹配所有字母         |                                                              |
+| [:blank:] | 所有水平空白         |                                                              |
+| [:punct:] | 匹配所有标点符号     |                                                              |
+| [:space:] | 所有水平或垂直的空格 |                                                              |
+| [:cntrl:] | 所有控制字符         | \n Ctrl-J 换行<br/>\r Ctrl-M 回车<br/>\f Ctrl-L 走行换页<br/>\t Ctrl-I tab键 |
+| [:graph:] | 所有可打印字符，不包括空格     |                                                              |
+| [:print:] | 所有可打印字符，包括空格 |                                                              |
+
+
