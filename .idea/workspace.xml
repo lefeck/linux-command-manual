@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="23be86c3-252d-491f-8a8f-dbc34f141280" name="变更" comment="" />
+    <list default="true" id="23be86c3-252d-491f-8a8f-dbc34f141280" name="变更" comment="add xargs command and etc">
+      <change afterPath="$PROJECT_DIR$/bash-style-guide1.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lvm/README1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bash-command-doc.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bash-style-guide.md" beforeDir="false" afterPath="$PROJECT_DIR$/bash-style-guide.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lvm/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/lvm/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/variables/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/variables/demo.sh" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +22,19 @@
   <component name="GOROOT" url="file:///usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="9716bc94-79ad-4cc2-a1bb-f95b07bb098e" />
+        <option name="url" value="https://github.com/lefeck/linux-command-manual.git" />
+      </UrlAndAccount>
+    </option>
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="true" />
@@ -42,11 +64,12 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
     &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/Johnny/go/src/linux-command-manual&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/Johnny/go/src/linux-command-manual/lvm&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="Push.Settings">
@@ -56,9 +79,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lvm" />
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lvm" />
       <recent name="$PROJECT_DIR$/awk" />
       <recent name="$PROJECT_DIR$/variables" />
       <recent name="$PROJECT_DIR$" />
@@ -67,6 +92,42 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="f2afffa8-db5a-4cf0-a6f0-9193869224ab">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="f2afffa8-db5a-4cf0-a6f0-9193869224ab" value="TOOL_WINDOW" />
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
